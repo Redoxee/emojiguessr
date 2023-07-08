@@ -3,7 +3,7 @@ const cors = require('cors');
 const content = require("./content/content.json");
 const express = require('express')
 const app = express()
-const port = 3001
+const port = 8100
 
 app.use(cors());
 
@@ -25,7 +25,7 @@ app.put('/reset', (req, res)=> {
 });
 
 app.get('/', (req, res) => {
-    req.send('hello player');
+    res.send('hello player');
 });
 
 app.listen(port, () => {
