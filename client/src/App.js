@@ -22,7 +22,7 @@ function App() {
   return (
     <div className="App">
       <emoji-picker></emoji-picker>
-      <button onClick={handleButton}>Click me</button>
+      <button onClick={handleButton}>Click ME</button>
       <p>{msg}</p>
     </div>
   );
