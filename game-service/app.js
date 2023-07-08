@@ -7,26 +7,44 @@ const port = 8100
 
 app.use(cors());
 
-let selected = 0;
+let selectedAnswer = 0;
+let currentChefId = 0;
+
 function selectNew() {
-    selected =  Math.floor(Math.random() * content.responses.length);
+    selectedAnswer =  Math.floor(Math.random() * content.responses.length);
+}
+
+function generatePlayerID(){
+    return Date.now();
 }
 
 selectNew();
 
+app.get('/chef', (req, res) => {
+    res.send({response: content.responses[selectedAnswer]});
+});
 
-app.get('/Chef', (req, res) => {
-    res.send({response: content.responses[selected]});
+app.get('/chefId', (req, res) => {
+    res.send({chefId: currentChefId})
+});
+
+app.put('/chefId/:chefId', (req, res) => {
+    currentChefId = req.params.chefId;
+    console.log('currentChefId is ' + currentChefId);
+    res.status(200);
 });
 
 app.put('/reset', (req, res)=> {
     selectNew();
-    res.send({response: content.responses[selected]});
+    res.send({response: content.responses[selectedAnswer]});
 });
 
 app.get('/', (req, res) => {
-    res.send('hello player');
+    res.send({
+        playerId : generatePlayerID()
+    });
 });
+
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
