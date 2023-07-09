@@ -59,6 +59,7 @@
                 }
 
                 hintNumber = res.data.hintNumber;
+                hints = res.data.hints;
 
                 if(chefId === playerId) {
                     if (hintNumber === 0) {
@@ -66,6 +67,7 @@
                     }
                     else {
                         setVisibility(hintPicker, false);
+                        setVisibility(emojiPicker, hints.length < hintNumber)
                     }
                 }
 
@@ -85,6 +87,16 @@
                         }
 
                         hintHolder.replaceChildren(...hints);
+                    }
+
+                    for (let i = 0; i < hintNumber; ++i) {
+                        const hintItem = hintHolder.childNodes[i];
+                        if (i < hints.length) {
+                            hintItem.textContent = hints[i];
+                        }
+                        else {
+                            hintItem.replaceChildren("");
+                        }
                     }
                 }
             }
@@ -124,7 +136,6 @@
         let questionLabel = document.getElementById('questionLabel');
         let emojiPicker =document.querySelector('emoji-picker'); 
         let hintPicker = document.getElementById('hintPicker');
-        emojiPicker.addEventListener('emoji-click', event => console.log(event.detail));
         let hintHolder = document.getElementById('hintHolder');
         setVisibility(emojiPicker, false);
         setVisibility(hintPicker, false);
@@ -145,6 +156,13 @@
             hintBtns.push(btn);
         }
 
+
         document.getElementById('hintPickerHolder').replaceChildren(...hintBtns);
+       
+        emojiPicker.addEventListener('emoji-click', (event)=>{
+            console.log(event.detail);
+            axiosGame.put(`/hint/${event.detail.unicode}`);
+        });
+       
     </script>
 </html>
