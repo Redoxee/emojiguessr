@@ -1,0 +1,23 @@
+<html>
+    <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
+    <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
+    <script>
+        const gameSrvUrl = "https://antonmakesgames.alwaysdata.net/";
+        window.addEventListener("load", async () => {
+            console.log('queriing');
+            const res = await axios.get(gameSrvUrl);
+            console.log(res);
+        });
+    </script>
+    <body>
+        Hello
+        <emoji-picker></emoji-picker>
+    </body>
+    <script>
+        document.querySelector('emoji-picker')
+            .addEventListener('emoji-click', event => console.log(event.detail));
+        
+
+
+    </script>
+</html>

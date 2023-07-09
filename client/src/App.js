@@ -1,14 +1,12 @@
 import './App.css';
-import axios from 'axios';
 import EmojiPicker from 'emoji-picker-react';
 import {useState, useEffect} from 'react';
-import React from 'react';
+import PlayerHeader from './components/PlayerHeader';
+import GameRefresher from './components/GameRefresher';
+import { axiosGame } from './AxiosGame';
 
 const refreshRate = 1000;
 
-const axiosGame = axios.create({
-  baseURL:'https://antonmakesgames.alwaysdata.net/',
-});
 
 function debug() {
   const handleReset = ()=>{
@@ -38,12 +36,12 @@ function App() {
 
     const res = await axiosGame.get(`/refresh/${playerId}`);
     const serverChefId = Number(res.data.chefId);
-     // console.log(`local ${typeof(chefId)} === server ${typeof(serverChefId)}`);
+    console.log(res);
     if(serverChefId !== chefId){
       setChefId(serverChefId)
     }
     
-    if (chefId) {
+    if (chefId !== 0 && serverChefId === playerId) {
       if(res.data.question)
       {
         setQuestion(res.data.question);
@@ -79,7 +77,9 @@ function App() {
 
   return (
     <div className="App">
+      <GameRefresher />
       <p>Emoji Guessr</p>
+      <PlayerHeader />
       <div>
         {
           playerId?`Hello player ${playerId}`:'no playerId'

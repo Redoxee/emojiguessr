@@ -26,7 +26,8 @@ app.get('/refresh/:playerId', (req, res)=> {
     let response = { 
         chefId: currentChefId
     };
-    const playerId = req.paramsplayerId;
+    const playerId = req.params.playerId;
+    console.log(`playerId ${playerId}`);
     if (currentChefId !== 0 && currentChefId === playerId) {
         response.question = content.questions[selectedAnswer];
     }
@@ -44,6 +45,7 @@ app.put('/chefId/:chefId', (req, res) => {
 app.put('/reset', (req, res)=> {
     currentChefId = 0;
     selectNew();
+    console.log("Reset");
     res.send({response: content.questions[selectedAnswer]});
 });
 
