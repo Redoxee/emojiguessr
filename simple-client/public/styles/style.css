@@ -28,6 +28,10 @@ body {
     color: white;
 }
 
+#chefButton {
+    font-size: 2em;
+}
+
 #playerLabel {
     font-weight: bold;
     font-size: 1.5em;
@@ -99,11 +103,23 @@ button:active {
     display: flex;
     gap: 1em;
 }
-
 #debug {
-    position: absolute;
-    bottom:0%;
-    right: 0%;
+    width: 100%;
+    display: flex;
+    flex-flow: row;
+    justify-content: flex-end;
+    gap: 1em;
+}
+#debug > * {
+    font-size: 0.4em;
+    padding: 0em;
+    border-radius: 0em;
+}
+
+#credits {
+    margin-top: 3em;
+    font-size: 0.5em;
+    color: white;
 }
 
 #roundScore,
@@ -127,12 +143,4 @@ button:active {
     font-size: 1.6em;
     color: #FFD369;
     font-weight: bold;
-}
-
-#roundScoresHolder {
-
-}
-
-#score {
-
 }

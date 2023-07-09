@@ -47,6 +47,7 @@
         let nameTemplates = [];
         
         const becomeChefButton = document.createElement('Button');
+        becomeChefButton.id = "chefButton";
         becomeChefButton.textContent = "I'm the chef"; 
         becomeChefButton.addEventListener('click', (event)=>{
             axiosGame.put(`/chefId/${playerId}`);
@@ -83,6 +84,8 @@
                         setVisibility(emojiPicker, false);
                     }
                 }
+
+                setVisibility(playerLabel, chefId !== 0);
 
                 hintNumber = res.data.hintNumber;
                 hints = res.data.hints;
@@ -218,10 +221,11 @@
                 <p>Scores</p>
                 <div id="scoreHolder"></div>
             </div>
-            <div id='debug'>
-                <button id="reset">R</button>
-                <button id='pause'>P</button>
-            </div>
+        </div>
+        <div id="credits">Made by AntonMakesGames with help from François Eoche</div>
+        <div id='debug'>
+            <button id="reset">R</button>
+            <button id='pause'>P</button>
         </div>
     </body>
 
