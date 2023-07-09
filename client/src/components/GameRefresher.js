@@ -5,6 +5,14 @@ import { axiosGame } from '../AxiosGame';
 
 const refreshRate = 1000;
 
+function getRefresh(pId) {
+    return async ()=>{
+        const res = await axiosGame.get(`/refresh/${pId}`);
+        const serverChefId = Number(res.data.chefId);
+        
+    }
+}
+
 function GameRefresher() {
     const dispatch = useDispatch();
     const refresh = async () => {

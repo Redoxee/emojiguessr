@@ -1,23 +1,73 @@
 <html>
     <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
     <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
-    <script>
+    <script type="text/javascript">
         const gameSrvUrl = "https://antonmakesgames.alwaysdata.net/";
+        
+        const axiosGame = axios.create({
+        baseURL: gameSrvUrl,
+        });
+
+        let playerId = 0;
+        let chefId = 0;
+        let refreshRate = 1000;
+        let playerLabel = null;
+        let chefLabel = null;
+        
+        const becomeChefButton = document.createElement('Button');
+        becomeChefButton.textContent = "I'm the chef"; 
+        becomeChefButton.addEventListener('click', (event)=>{
+            axiosGame.put(`/chefId/${playerId}`);
+        });
+
+
+        async function refresh() {
+            if(playerId)
+            {
+                const res = await axiosGame.get(`/refresh/${playerId}`);
+                console.log(res);
+                const srvChef = res.data.chefId;
+                
+                if(srvChef !== chefId)
+                {
+                    chefId = srvChef;
+                    chefLabel.removeChild(becomeChefButton);
+                    if(chefId) {
+                        chefLabel.textContent = `chefIs ${chefId}`;
+                    }
+                    else {
+                        chefLabel.appendChild(becomeChefButton);
+                    }
+                }
+
+
+            }
+
+            setTimeout(refresh, refreshRate);
+        }
+
         window.addEventListener("load", async () => {
             console.log('queriing');
             const res = await axios.get(gameSrvUrl);
             console.log(res);
+            playerId = res.data.playerId;
+
+            playerLabel = document.getElementById('playerLabel');
+            chefLabel = document.getElementById('chefLabel');
+
+            playerLabel.textContent = `player is ${playerId}`;
+
+            chefLabel.appendChild(becomeChefButton);
+            refresh();
         });
     </script>
     <body>
-        Hello
+        <div id='playerLabel'></div>
+        <div id='chefLabel'></div>
         <emoji-picker></emoji-picker>
     </body>
-    <script>
+    <script type="text/javascript">
         document.querySelector('emoji-picker')
             .addEventListener('emoji-click', event => console.log(event.detail));
-        
-
-
     </script>
 </html>
