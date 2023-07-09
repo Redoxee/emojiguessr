@@ -18,7 +18,9 @@
         let question = null;
         let refreshRate = 1000;
         let hintNumber = 0;
+        let hints = [];
         let pauseRefresh = false;
+        let responses = [];
         
         const becomeChefButton = document.createElement('Button');
         becomeChefButton.textContent = "I'm the chef"; 
@@ -46,7 +48,6 @@
                 {
                     chefId = srvChef;
                     if(chefId) {
-                        console.log(chefId, playerId)
                         if(chefId === playerId) {
                             chefLabel.replaceChildren("you're the chef");
                         } else 
@@ -75,20 +76,21 @@
 
                 if (hintNumber === 0) {
                     setVisibility(hintHolder, false);
+                    setVisibility(responsesHolder, false);
                 }
                 else
                 {
                     setVisibility(hintHolder, true);
 
                     if (hintHolder.childNodes.length !== hintNumber) {
-                        let hints = [];
+                        let hintItems = [];
                         for (let i = 0; i < hintNumber; ++i){
                             const hint = document.createElement('div');
                             hint.id = "hint";
-                            hints.push(hint);
+                            hintItems.push(hint);
                         }
 
-                        hintHolder.replaceChildren(...hints);
+                        hintHolder.replaceChildren(...hintItems);
                     }
 
                     for (let i = 0; i < hintNumber; ++i) {
@@ -103,6 +105,8 @@
                             hintItem.replaceChildren("");
                         }
                     }
+
+                    setVisibility(responsesHolder, playerId !== chefId);
                 }
             }
 
@@ -116,8 +120,22 @@
             playerId = res.data.playerId;
 
             playerLabel.replaceChildren(`player is ${playerId}`);
-
             chefLabel.appendChild(becomeChefButton);
+
+            responses = res.data.responses;
+            let responsesBtn = [];
+            for (let i= 0; i < responses.length; ++i){
+                const index = i;
+                const responseButton = document.createElement('button');
+                responseButton.textContent = responses[index];
+                responseButton.addEventListener('click',()=>{
+                    axiosGame.put(`/response/${playerId}/${index}`);
+                });
+
+                responsesBtn.push(responseButton);
+            }
+
+            responsesHolder.replaceChildren(...responsesBtn);
             refresh();
         });
     </script>
@@ -132,6 +150,7 @@
 
         <div id="hintHolder"></div>
         <emoji-picker></emoji-picker>
+        <div id="responsesHolder"></div>
         <div id='debug'>
             <button id="reset">R</button>
             <button id='pause'>P</button>
@@ -145,6 +164,7 @@
         let emojiPicker =document.querySelector('emoji-picker'); 
         let hintPicker = document.getElementById('hintPicker');
         let hintHolder = document.getElementById('hintHolder');
+        let responsesHolder = document.getElementById('responsesHolder');
         setVisibility(emojiPicker, false);
         setVisibility(hintPicker, false);
         let resetButton = document.getElementById("reset");

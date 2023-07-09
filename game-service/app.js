@@ -6,7 +6,7 @@ const app = express()
 const port = 8100
 
 app.use(cors());
-
+let selectedContent = content[content.selected_content];
 let selectedAnswer = 0;
 let currentChefId = 0;
 
@@ -18,7 +18,7 @@ function generatePlayerID(){
 }
 
 function selectNew() {
-    selectedAnswer =  Math.floor(Math.random() * content.questions.length);
+    selectedAnswer =  Math.floor(Math.random() * selectedContent.length);
     hints = [];
     hintNumber = 0;
 }
@@ -36,7 +36,7 @@ app.get('/refresh/:playerId', (req, res)=> {
     const playerId = req.params.playerId;
     console.log(`playerId ${playerId}`);
     if (currentChefId !== 0 && currentChefId === playerId) {
-        response.question = content.questions[selectedAnswer];
+        response.question = selectedContent[selectedAnswer];
     }
 
     res.send(response);
@@ -58,7 +58,7 @@ app.put('/reset', (req, res)=> {
     currentChefId = 0;
     selectNew();
     console.log("Reset");
-    res.send({response: content.questions[selectedAnswer]});
+    res.send({response: selectedContent[selectedAnswer]});
 });
 
 app.put('/hint/:hint',(req, res)=>{
@@ -70,7 +70,8 @@ app.put('/hint/:hint',(req, res)=>{
 
 app.get('/', (req, res) => {
     res.send({
-        playerId : generatePlayerID()
+        playerId : generatePlayerID(),
+        responses: selectedContent
     });
 });
 
