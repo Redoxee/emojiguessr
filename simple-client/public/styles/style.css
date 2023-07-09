@@ -1,3 +1,17 @@
+#game {
+    display: flex;
+    flex-flow: column wrap;
+    align-items: center;
+    gap: 1em;
+}
+
+#playerInfo {
+    display: flex;
+    flex-flow: row;
+    width: 100%;
+    justify-content: space-between;
+}
+
 #hint{
     border-color: black;
     border-style: solid;

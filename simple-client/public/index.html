@@ -175,7 +175,7 @@
             responses = res.data.responses;
             nameTemplates = res.data.nameTemplates;
             
-            playerLabel.replaceChildren(`Player is ${getNameFromId(playerId)}`);
+            playerLabel.replaceChildren(`You're ${getNameFromId(playerId)}`);
             chefLabel.appendChild(becomeChefButton);
 
             let responsesBtn = [];
@@ -195,30 +195,36 @@
         });
     </script>
     <body>
-        <div id='playerLabel'></div>
-        <div id='chefLabel'></div>
-        <div id='questionLabel'></div>
-        <div id='hintPicker'>
-            <p>In how many emoji can you make it guess ?</p>
-            <div id="hintPickerHolder"></div>
-        </div>
-        <button id="nextRoundButton">Next Round</button>
-        <div id="roundScore">
-            <p>Current Round</p>
-            <div id="roundScoresHolder"></div>
-        </div>
-        <div id="score">
-            <p>Scores</p>
-            <div id="scoreHolder"></div>
-        </div>
-        <div id="hintHolder"></div>
-        <emoji-picker></emoji-picker>
-        <div id="responsesHolder"></div>
-        <div id='debug'>
-            <button id="reset">R</button>
-            <button id='pause'>P</button>
+        <div id="game">
+            <div id="title">🌶EmojiGuessr🔥</div>
+            <div id="playerInfo">
+                <div id='playerLabel'></div>
+                <div id='chefLabel'></div>
+            </div>
+            <div id='questionLabel'></div>
+            <div id='hintPicker'>
+                <p>In how many emoji can you make it guess ?</p>
+                <div id="hintPickerHolder"></div>
+            </div>
+            <button id="nextRoundButton">Next Round</button>
+            <div id="hintHolder"></div>
+            <emoji-picker></emoji-picker>
+            <div id="responsesHolder"></div>
+            <div id="roundScore">
+                <p>Current Round</p>
+                <div id="roundScoresHolder"></div>
+            </div>
+            <div id="score">
+                <p>Scores</p>
+                <div id="scoreHolder"></div>
+            </div>
+            <div id='debug'>
+                <button id="reset">R</button>
+                <button id='pause'>P</button>
+            </div>
         </div>
     </body>
+
     <script type="text/javascript">
         
         let playerLabel = document.getElementById('playerLabel');
