@@ -1,18 +1,23 @@
 <html>
+    <link href="styles/style.css" rel="stylesheet" type="text/css">    
     <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
     <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
     <script type="text/javascript">
         const gameSrvUrl = "https://antonmakesgames.alwaysdata.net/";
         
+        function setVisibility(element, display) {
+            element.style.display = display ? '' : 'none';
+        }
+
         const axiosGame = axios.create({
         baseURL: gameSrvUrl,
         });
 
         let playerId = 0;
         let chefId = 0;
+        let question = null;
         let refreshRate = 1000;
-        let playerLabel = null;
-        let chefLabel = null;
+        let hintNumber = 0;
         
         const becomeChefButton = document.createElement('Button');
         becomeChefButton.textContent = "I'm the chef"; 
@@ -26,21 +31,62 @@
             {
                 const res = await axiosGame.get(`/refresh/${playerId}`);
                 console.log(res);
-                const srvChef = res.data.chefId;
+                const srvChef = Number(res.data.chefId);
+                if (res.data.question) {
+                    question = res.data.question;
+                    questionLabel.textContent = question;
+                }
+                else
+                {
+                    questionLabel.textContent = '';
+                }
                 
                 if(srvChef !== chefId)
                 {
                     chefId = srvChef;
-                    chefLabel.removeChild(becomeChefButton);
                     if(chefId) {
-                        chefLabel.textContent = `chefIs ${chefId}`;
+                        console.log(chefId, playerId)
+                        if(chefId === playerId) {
+                            chefLabel.replaceChildren("you're the chef");
+                        } else 
+                        {
+                            chefLabel.replaceChildren(`Chef is ${chefId}`);
+                        }
                     }
                     else {
-                        chefLabel.appendChild(becomeChefButton);
+                        chefLabel.replaceChildren(becomeChefButton);
                     }
                 }
 
+                hintNumber = res.data.hintNumber;
 
+                if(chefId === playerId) {
+                    if (hintNumber === 0) {
+                        setVisibility(hintPicker, true);
+                    }
+                    else {
+                        setVisibility(hintPicker, false);
+                    }
+                }
+
+                if (hintNumber === 0) {
+                    setVisibility(hintHolder, false);
+                }
+                else
+                {
+                    setVisibility(hintHolder, true);
+
+                    if (hintHolder.childNodes.length !== hintNumber) {
+                        let hints = [];
+                        for (let i = 0; i < hintNumber; ++i){
+                            const hint = document.createElement('div');
+                            hint.id = "hint";
+                            hints.push(hint);
+                        }
+
+                        hintHolder.replaceChildren(...hints);
+                    }
+                }
             }
 
             setTimeout(refresh, refreshRate);
@@ -52,10 +98,7 @@
             console.log(res);
             playerId = res.data.playerId;
 
-            playerLabel = document.getElementById('playerLabel');
-            chefLabel = document.getElementById('chefLabel');
-
-            playerLabel.textContent = `player is ${playerId}`;
+            playerLabel.replaceChildren(`player is ${playerId}`);
 
             chefLabel.appendChild(becomeChefButton);
             refresh();
@@ -64,10 +107,44 @@
     <body>
         <div id='playerLabel'></div>
         <div id='chefLabel'></div>
+        <div id='questionLabel'></div>
+        <div id='hintPicker'>
+            <p>In how many emoji can you make it guess ?</p>
+            <div id="hintPickerHolder"></div>
+        </div>
+
+        <div id="hintHolder"></div>
         <emoji-picker></emoji-picker>
+        <div id='debug'><button id="reset"></button></div>
     </body>
     <script type="text/javascript">
-        document.querySelector('emoji-picker')
-            .addEventListener('emoji-click', event => console.log(event.detail));
+        
+        let playerLabel = document.getElementById('playerLabel');
+        let chefLabel = document.getElementById('chefLabel');
+        let questionLabel = document.getElementById('questionLabel');
+        let emojiPicker =document.querySelector('emoji-picker'); 
+        let hintPicker = document.getElementById('hintPicker');
+        emojiPicker.addEventListener('emoji-click', event => console.log(event.detail));
+        let hintHolder = document.getElementById('hintHolder');
+        setVisibility(emojiPicker, false);
+        setVisibility(hintPicker, false);
+        let resetButton = document.getElementById("reset");
+        resetButton.addEventListener('click',(event)=> {
+            axiosGame.put('/reset');
+        });
+
+        let hintBtns = [];
+        for(let i=0; i < 7; ++i)
+        {
+            let index = i + 1;
+            const btn = document.createElement('button');
+            btn.textContent = '' + index;
+            btn.addEventListener('click',(event)=>  {
+                axiosGame.put(`/hintNumber/${index}`);
+            });
+            hintBtns.push(btn);
+        }
+
+        document.getElementById('hintPickerHolder').replaceChildren(...hintBtns);
     </script>
 </html>

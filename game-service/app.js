@@ -10,12 +10,17 @@ app.use(cors());
 let selectedAnswer = 0;
 let currentChefId = 0;
 
+let hintNumber = 0;
+let hints = [];
+
 function generatePlayerID(){
     return Date.now();
 }
 
 function selectNew() {
     selectedAnswer =  Math.floor(Math.random() * content.questions.length);
+    hints = [];
+    hintNumber = 0;
 }
 
 app.get('/chefId/', (req, res) => {
@@ -24,7 +29,9 @@ app.get('/chefId/', (req, res) => {
 
 app.get('/refresh/:playerId', (req, res)=> {
     let response = { 
-        chefId: currentChefId
+        chefId: currentChefId,
+        hintNumber: hintNumber,
+        hints: hints
     };
     const playerId = req.params.playerId;
     console.log(`playerId ${playerId}`);
@@ -42,11 +49,23 @@ app.put('/chefId/:chefId', (req, res) => {
     res.status(200);
 });
 
+app.put('/hintNumber/:hintNumber', (req, res)=> {
+    hintNumber = req.params.hintNumber;
+    res.status(200);
+});
+
 app.put('/reset', (req, res)=> {
     currentChefId = 0;
     selectNew();
     console.log("Reset");
     res.send({response: content.questions[selectedAnswer]});
+});
+
+app.put('/hint/:hint',(req, res)=>{
+    if(hints.length < hintNumber) {
+        hints.push(req.params.hint);
+    }
+    res.status(200);
 });
 
 app.get('/', (req, res) => {
