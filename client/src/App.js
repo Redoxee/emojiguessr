@@ -7,7 +7,6 @@ import { axiosGame } from './AxiosGame';
 
 const refreshRate = 1000;
 
-
 function debug() {
   const handleReset = ()=>{
     axiosGame.put('/reset');
@@ -17,6 +16,7 @@ function debug() {
 }
 
 let isRefreshing = false;
+let pauseRefresh = false;
 
 function App() {
   const [playerId, setPlayerId] = useState(0);
