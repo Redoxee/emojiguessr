@@ -1,8 +1,35 @@
 <html>
-    <link href="styles/style.css" rel="stylesheet" type="text/css">    
+    <link href="styles/style.css" rel="stylesheet" type="text/css">
     <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
+    <script type="text/javascript" src="js/PseudonymousModule.js"></script>
     <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
+      
+    <body>
+        <div id="game">
+            <div id="title">🌶EmojiGuessr🔥</div>
+            <div id="playerInfo">
+                <div id='playerLabel'></div>
+                <div id='chefLabel'></div>
+            </div>
+            <div id='questionLabel'></div>
+            <div id='hintPicker'>
+                <p>In how many emoji can you make it guess ?</p>
+                <div id="hintPickerHolder"></div>
+            </div>
+            <button id="nextRoundButton">Next Round</button>
+            <div id="hintHolder"></div>
+            <emoji-picker></emoji-picker>
+            <div id="responsesHolder"></div>
+        </div>
+        <div id="credits">Made by AntonMakesGames with help from François Eoche</div>
+        <div id='debug'>
+            <button id="reset">R</button>
+            <button id='pause'>P</button>
+        </div>
+    </body>
+
     <script type="text/javascript">
+        test_pseudonymes();
         const gameSrvUrl = "https://antonmakesgames.alwaysdata.net/";
         // const gameSrvUrl = "http://localhost:8100";
 
@@ -148,31 +175,6 @@
 
                     setVisibility(responsesHolder, playerId !== chefId);
                 }
-
-                {
-
-                    let rr = [];
-                    
-                    for (const [key, value] of Object.entries(res.data.roundResults)) {
-                        const entry = document.createElement('div');
-                        entry.id = "roundEntry";
-                        entry.textContent = `${getNameFromId(key)} (${value})`;
-                        rr.push(entry);
-                    }
-                    roundScores.replaceChildren(...rr);
-                }
-
-                {
-                    let ts = [];
-                    for (const [key, value] of Object.entries(res.data.scores)) {
-                        const entry = document.createElement('div');
-                        entry.id = "scoreEntry";
-                        entry.textContent = `${getNameFromId(key)} (${value})`;
-                        ts.push(entry);
-                    }
-
-                    allScrores.replaceChildren(...ts);
-                }
             }
 
             setTimeout(refresh, refreshRate);
@@ -205,38 +207,7 @@
             refresh();
         });
     </script>
-    <body>
-        <div id="game">
-            <div id="title">🌶EmojiGuessr🔥</div>
-            <div id="playerInfo">
-                <div id='playerLabel'></div>
-                <div id='chefLabel'></div>
-            </div>
-            <div id='questionLabel'></div>
-            <div id='hintPicker'>
-                <p>In how many emoji can you make it guess ?</p>
-                <div id="hintPickerHolder"></div>
-            </div>
-            <button id="nextRoundButton">Next Round</button>
-            <div id="hintHolder"></div>
-            <emoji-picker></emoji-picker>
-            <div id="responsesHolder"></div>
-            <div id="roundScore">
-                <p>Current Round</p>
-                <div id="roundScoresHolder"></div>
-            </div>
-            <div id="score">
-                <p>Scores</p>
-                <div id="scoreHolder"></div>
-            </div>
-        </div>
-        <div id="credits">Made by AntonMakesGames with help from François Eoche</div>
-        <div id='debug'>
-            <button id="reset">R</button>
-            <button id='pause'>P</button>
-        </div>
-    </body>
-
+    
     <script type="text/javascript">
         
         let playerLabel = document.getElementById('playerLabel');
@@ -247,8 +218,6 @@
         let hintHolder = document.getElementById('hintHolder');
         let responsesHolder = document.getElementById('responsesHolder');
         let nextRoundButton = document.getElementById('nextRoundButton');
-        let roundScores = document.getElementById('roundScoresHolder');
-        let allScrores = document.getElementById('scoreHolder');
         setVisibility(emojiPicker, false);
         setVisibility(hintPicker, false);
         let resetButton = document.getElementById("reset");
