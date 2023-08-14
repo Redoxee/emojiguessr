@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "axios": "^1.4.0",
+    "commonjs": "^0.0.1",
+    "ts-loader": "^9.4.4"
+  }
+}
