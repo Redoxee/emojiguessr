@@ -7,6 +7,9 @@ const port = 8100
 
 app.use(cors());
 let selectedContent = content[content.selected_content];
+
+let frame = 1;
+
 let selectedAnswer = 0;
 let currentChefId = 0;
 
@@ -24,6 +27,7 @@ function selectNew() {
     hints = [];
     roundResults = {};
     hintNumber = 0;
+    frame++;
 }
 
 app.get('/chefId/', (req, res) => {
@@ -36,10 +40,11 @@ app.get('/refresh/:playerId', (req, res)=> {
         hintNumber: hintNumber,
         hints: hints,
         scores,
-        roundResults
+        roundResults,
+        frame
     };
     const playerId = req.params.playerId;
-    console.log(`playerId ${playerId}`);
+    console.log(`playerId ${playerId}, frame ${frame}`);
     if (currentChefId !== 0 && currentChefId === playerId) {
         response.question = selectedContent[selectedAnswer];
     }
@@ -50,6 +55,7 @@ app.get('/refresh/:playerId', (req, res)=> {
 app.put('/chefId/:chefId', (req, res) => {
     currentChefId = req.params.chefId;
     selectNew();
+    frame++;
     console.log('currentChefId is ' + currentChefId);
     res.status(200);
 });
@@ -58,11 +64,13 @@ app.put('/nextRound',(req, res) => {
     currentChefId = 0;
     selectNew();
     console.log('Start next round');
+    frame++;
     res.status(200);
 });
 
 app.put('/hintNumber/:hintNumber', (req, res)=> {
     hintNumber = req.params.hintNumber;
+    frame++;
     res.status(200);
 });
 
@@ -70,6 +78,7 @@ app.put('/reset', (req, res)=> {
     currentChefId = 0;
     selectNew();
     scores = {};
+    frame++;
     console.log("Reset");
     res.send({response: selectedContent[selectedAnswer]});
 });
@@ -78,11 +87,15 @@ app.put('/hint/:hint',(req, res)=>{
     if(hints.length < hintNumber) {
         hints.push(req.params.hint);
     }
+    
+    frame++;
     res.status(200);
 });
 
 app.put('/response/:playerId/:responseIndex', (req, res)=>{
     const {playerId, responseIndex} = req.params;
+    
+    frame++;
     if(!roundResults[playerId])
     {
         if(responseIndex == selectedAnswer) {
@@ -127,7 +140,8 @@ app.put('/response/:playerId/:responseIndex', (req, res)=>{
 
 app.get('/', (req, res) => {
     res.send({
-        responses: selectedContent
+        responses: selectedContent,
+        frame
     });
 });
 
