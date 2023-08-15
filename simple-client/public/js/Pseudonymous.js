@@ -1,6 +1,4 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.test_pseudonymes = exports.GetSeedFromIndexes = exports.GetNameFromIndexes = exports.GetNameFromSeed = exports.pseudonimous_data = void 0;
 const pseudonimous_data = [
     [
         "Abundant",
@@ -777,7 +775,6 @@ const pseudonimous_data = [
         "Turtle"
     ]
 ];
-exports.pseudonimous_data = pseudonimous_data;
 const NAME_NUMBER = (256 * 256 * 256);
 function GetNameFromSeed(seed) {
     seed = seed % NAME_NUMBER;
@@ -790,15 +787,12 @@ function GetNameFromSeed(seed) {
     }
     return result.join(' ');
 }
-exports.GetNameFromSeed = GetNameFromSeed;
 function GetNameFromIndexes(one, two, three) {
     return `${pseudonimous_data[0][one % 255]} ${pseudonimous_data[1][two % 255]} ${pseudonimous_data[2][three % 255]}`;
 }
-exports.GetNameFromIndexes = GetNameFromIndexes;
 function GetSeedFromIndexes(one, two, three) {
     return (three & 255) << 16 | (255 & two) << 8 | (255 & one);
 }
-exports.GetSeedFromIndexes = GetSeedFromIndexes;
 function test_pseudonymes() {
     for (let i = 0; i < (256); ++i) {
         const one = Math.floor(Math.random() * 255);
@@ -811,4 +805,3 @@ function test_pseudonymes() {
         console.log(GetNameFromIndexes(one, two, three));
     }
 }
-exports.test_pseudonymes = test_pseudonymes;

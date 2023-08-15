@@ -779,10 +779,10 @@ const NAME_NUMBER = (256 * 256 * 256);
 
 function GetNameFromSeed(seed : number) {
 	seed = seed % NAME_NUMBER;
-	let numberResult = [];
-	let result = [];
+	let numberResult : number[] = [];
+	let result : string[] = [];
 	for(let index = 0; index < pseudonimous_data.length; ++index) {
-		const idx = (seed >> index * 8) & 255;
+		const idx : number = (seed >> index * 8) & 255;
 		numberResult.push(idx);
 		result.push(pseudonimous_data[index][idx]);
 	}
@@ -810,5 +810,3 @@ function test_pseudonymes() : void{
 		console.log(GetNameFromIndexes(one, two, three));
 	} 
 }
-
-export {pseudonimous_data, GetNameFromSeed, GetNameFromIndexes, GetSeedFromIndexes, test_pseudonymes};
