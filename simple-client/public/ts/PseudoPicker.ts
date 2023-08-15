@@ -70,7 +70,7 @@ function create_pseudonyme_picker() : PseudoPicker {
 	confirmationButton.className = 'pseudo-picker-confirmation';
 	confirmationButton.addEventListener('click', ()=>{
 		const id = GetSeedFromIndexes(pseudoPicker.selectedOptions[0], pseudoPicker.selectedOptions[1], pseudoPicker.selectedOptions[2]);
-		const name = GetNameFromSeed(id);
+		const name = GetNameFromId(id);
 		pseudoPicker.dispatchEvent(new CustomEvent(selectionEventName, {detail: {
 			name,
 			id

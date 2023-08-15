@@ -51,40 +51,32 @@
         let resetButton = document.getElementById("reset");
         
         let playerId = 0;
-        let chefId = 0;
+        let chefId = -1;
         let question = null;
         let refreshRate = 2000;
         let hintNumber = 0;
         let hints = [];
         let pauseRefresh = false;
-        let responses = [];
-        let nameTemplates = [];
         let hintBtns = [];
 
         setVisibility(emojiPicker, false);
         setVisibility(hintPicker, false);
+        setVisibility(playerLabel, false);
+        setVisibility(responsesHolder, false);
+        setVisibility(nextRoundButton, false);
 
         {
             const pseudonymPicker = create_pseudonyme_picker();
             nameBuilderElement.appendChild(pseudonymPicker);
             pseudonymPicker.addEventListener('OnPseudoPicked', (event) => {
                 console.log(event.detail);
+                playerId = event.detail.id;
+                
+                playerLabel.replaceChildren(`You're ${event.detail.name}`);
+                setVisibility(playerLabel, true);
+                setVisibility(nameBuilderElement, false);
+                refresh();
             })
-        }
-
-        function getNameFromId(id) {
-            let name = '';
-            let rng = GetSeededGenerator(id);
-            let firstPull = rng();
-
-            for(let i = 0; i < nameTemplates.length; ++i){
-                const part = nameTemplates[i]
-                let index = Math.floor(rng() * part.length);
-                name += part[index];
-            }
-
-            console.log(id, '->', name, '| first pull ->', firstPull);
-            return name;
         }
 
         const axiosGame = axios.create({
@@ -94,13 +86,8 @@
         window.addEventListener("load", async () => {
             const res = await axiosGame.get();
             console.log(res);
-            playerId = res.data.playerId;
             
-            responses = res.data.responses;
-            nameTemplates = res.data.nameTemplates;
-            
-            playerLabel.replaceChildren(`You're ${getNameFromId(playerId)}`);
-            chefLabel.appendChild(becomeChefButton);
+            const responses = res.data.responses;
 
             let responsesBtn = [];
             for (let i= 0; i < responses.length; ++i){
@@ -115,12 +102,11 @@
             }
 
             responsesHolder.replaceChildren(...responsesBtn);
-            refresh();
         });
 
         const becomeChefButton = document.createElement('Button');
         becomeChefButton.id = "chefButton";
-        becomeChefButton.textContent = "I'm the chef"; 
+        becomeChefButton.textContent = "I'm the game master"; 
         becomeChefButton.addEventListener('click', (event)=>{
             axiosGame.put(`/chefId/${playerId}`);
         });
@@ -145,10 +131,10 @@
                     chefId = srvChef;
                     if(chefId) {
                         if(chefId === playerId) {
-                            chefLabel.replaceChildren("you're the chef");
+                            chefLabel.replaceChildren(`you're ${GetNameFromId(playerId)}, the game master`);
                         } else 
                         {
-                            chefLabel.replaceChildren(`Chef is ${getNameFromId(chefId)}`);
+                            chefLabel.replaceChildren(`The game master is ${GetNameFromId(chefId)}`);
                         }
                     }
                     else {
@@ -157,7 +143,7 @@
                     }
                 }
 
-                setVisibility(playerLabel, chefId !== 0);
+                setVisibility(playerLabel, chefId !== playerId);
 
                 hintNumber = res.data.hintNumber;
                 hints = res.data.hints;

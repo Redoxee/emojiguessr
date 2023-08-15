@@ -105,41 +105,5 @@
         "Alien",
         "The Big Lebowski",
         "La Ligne verte"
-    ],
-    "nameTemplates": [
-        [
-            "Green",
-            "Gray",
-            "Slick",
-            "Bright",
-            "Good",
-            "Mean",
-            "Fast",
-            "Skilled",
-            "Smallest",
-            "Super",
-            "Crazed"
-        ],
-        [
-            "",
-            "Green",
-            "Gray",
-            "Skilled",
-            "Slick",
-            "Bright",
-            "Good",
-            "Mean",
-            "Fast",
-            "Grand"
-        ],
-        [
-            "Cat",
-            "Dog",
-            "Car",
-            "Sheep",
-            "Boat",
-            "Mountain",
-            "Cheeta"
-        ]
     ]
 }

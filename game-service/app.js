@@ -127,9 +127,7 @@ app.put('/response/:playerId/:responseIndex', (req, res)=>{
 
 app.get('/', (req, res) => {
     res.send({
-        playerId : generatePlayerID(),
-        responses: selectedContent,
-        nameTemplates: content.nameTemplates
+        responses: selectedContent
     });
 });
 
