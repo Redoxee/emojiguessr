@@ -1,0 +1,25 @@
+.pseudo-picker {
+	width: 20em;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap:0.3em;
+}
+
+.pseudo-picker-row {
+	display: flex;
+	flex-direction: row;
+    place-content: center;
+    place-items: center;
+	width: 100%;
+	gap:0.5em;
+}
+
+.pseudo-picker-button {
+	background-color: blueviolet;
+}
+
+.pseudo-picker-button.selected {
+	background-color: beige;
+	color: black;
+}

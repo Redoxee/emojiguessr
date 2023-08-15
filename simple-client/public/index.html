@@ -1,15 +1,21 @@
 <html>
-    <link href="styles/style.css" rel="stylesheet" type="text/css">
+    <link href="style.css" rel="stylesheet" type="text/css">
     <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
-    <script type="text/javascript" src="js/PseudonymousModule.js"></script>
     <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
-      
+    <script src="js/Utils.js"></script>
+    <script src="js/Pseudonymous.js"></script>
+    <script src="js/PseudoPicker.js"></script>
+    <link href="css/PseudoPicker.css" rel="stylesheet" type="text/css">
+
     <body>
         <div id="game">
             <div id="title">🌶EmojiGuessr🔥</div>
             <div id="playerInfo">
                 <div id='playerLabel'></div>
                 <div id='chefLabel'></div>
+            </div>
+            <div id = "NameBuilder">
+                <p>Select a name</p>
             </div>
             <div id='questionLabel'></div>
             <div id='hintPicker'>
@@ -29,32 +35,46 @@
     </body>
 
     <script type="text/javascript">
-        test_pseudonymes();
-        const gameSrvUrl = "https://antonmakesgames.alwaysdata.net/";
-        // const gameSrvUrl = "http://localhost:8100";
-
-        function setVisibility(element, display) {
-            element.style.display = display ? '' : 'none';
-        }
-
-        Math.seed = function(s) {
-            var mask = 0xffffffff;
-            var m_w  = (123456789 + s) & mask;
-            var m_z  = (987654321 - s) & mask;
-
-            return function() {
-            m_z = (36969 * (m_z & 65535) + (m_z >>> 16)) & mask;
-            m_w = (18000 * (m_w & 65535) + (m_w >>> 16)) & mask;
-
-            var result = ((m_z << 16) + (m_w & 65535)) >>> 0;
-            result /= 4294967296;
-            return result;
-            }
-        }
+        // const gameSrvUrl = "https://antonmakesgames.alwaysdata.net/";
+        const gameSrvUrl = "http://localhost:8100";
         
+        const nameBuilderElement = document.getElementById('NameBuilder');
+
+        let playerLabel = document.getElementById('playerLabel');
+        let chefLabel = document.getElementById('chefLabel');
+        let questionLabel = document.getElementById('questionLabel');
+        let emojiPicker =document.querySelector('emoji-picker'); 
+        let hintPicker = document.getElementById('hintPicker');
+        let hintHolder = document.getElementById('hintHolder');
+        let responsesHolder = document.getElementById('responsesHolder');
+        let nextRoundButton = document.getElementById('nextRoundButton');
+        let resetButton = document.getElementById("reset");
+        
+        let playerId = 0;
+        let chefId = 0;
+        let question = null;
+        let refreshRate = 2000;
+        let hintNumber = 0;
+        let hints = [];
+        let pauseRefresh = false;
+        let responses = [];
+        let nameTemplates = [];
+        let hintBtns = [];
+
+        setVisibility(emojiPicker, false);
+        setVisibility(hintPicker, false);
+
+        {
+            const pseudonymPicker = create_pseudonyme_picker();
+            nameBuilderElement.appendChild(pseudonymPicker);
+            pseudonymPicker.addEventListener('OnPseudoPicked', (event) => {
+                console.log(event.detail);
+            })
+        }
+
         function getNameFromId(id) {
             let name = '';
-            let rng = Math.seed(id);
+            let rng = GetSeededGenerator(id);
             let firstPull = rng();
 
             for(let i = 0; i < nameTemplates.length; ++i){
@@ -70,17 +90,34 @@
         const axiosGame = axios.create({
             baseURL: gameSrvUrl,
         });
-
-        let playerId = 0;
-        let chefId = 0;
-        let question = null;
-        let refreshRate = 1000;
-        let hintNumber = 0;
-        let hints = [];
-        let pauseRefresh = false;
-        let responses = [];
-        let nameTemplates = [];
         
+        window.addEventListener("load", async () => {
+            const res = await axiosGame.get();
+            console.log(res);
+            playerId = res.data.playerId;
+            
+            responses = res.data.responses;
+            nameTemplates = res.data.nameTemplates;
+            
+            playerLabel.replaceChildren(`You're ${getNameFromId(playerId)}`);
+            chefLabel.appendChild(becomeChefButton);
+
+            let responsesBtn = [];
+            for (let i= 0; i < responses.length; ++i){
+                const index = i;
+                const responseButton = document.createElement('button');
+                responseButton.textContent = responses[index];
+                responseButton.addEventListener('click',()=>{
+                    axiosGame.put(`/response/${playerId}/${index}`);
+                });
+
+                responsesBtn.push(responseButton);
+            }
+
+            responsesHolder.replaceChildren(...responsesBtn);
+            refresh();
+        });
+
         const becomeChefButton = document.createElement('Button');
         becomeChefButton.id = "chefButton";
         becomeChefButton.textContent = "I'm the chef"; 
@@ -180,56 +217,15 @@
             setTimeout(refresh, refreshRate);
         }
 
-        window.addEventListener("load", async () => {
-            const res = await axios.get(gameSrvUrl);
-            console.log(res);
-            playerId = res.data.playerId;
-            
-            responses = res.data.responses;
-            nameTemplates = res.data.nameTemplates;
-            
-            playerLabel.replaceChildren(`You're ${getNameFromId(playerId)}`);
-            chefLabel.appendChild(becomeChefButton);
-
-            let responsesBtn = [];
-            for (let i= 0; i < responses.length; ++i){
-                const index = i;
-                const responseButton = document.createElement('button');
-                responseButton.textContent = responses[index];
-                responseButton.addEventListener('click',()=>{
-                    axiosGame.put(`/response/${playerId}/${index}`);
-                });
-
-                responsesBtn.push(responseButton);
-            }
-
-            responsesHolder.replaceChildren(...responsesBtn);
-            refresh();
-        });
-    </script>
-    
-    <script type="text/javascript">
-        
-        let playerLabel = document.getElementById('playerLabel');
-        let chefLabel = document.getElementById('chefLabel');
-        let questionLabel = document.getElementById('questionLabel');
-        let emojiPicker =document.querySelector('emoji-picker'); 
-        let hintPicker = document.getElementById('hintPicker');
-        let hintHolder = document.getElementById('hintHolder');
-        let responsesHolder = document.getElementById('responsesHolder');
-        let nextRoundButton = document.getElementById('nextRoundButton');
-        setVisibility(emojiPicker, false);
-        setVisibility(hintPicker, false);
-        let resetButton = document.getElementById("reset");
         resetButton.addEventListener('click',(event)=> {
             axiosGame.put('/reset');
         });
+
         let pauseButton = document.getElementById('pause');
         pauseButton.addEventListener('click', ()=> {
             pauseRefresh = !pauseRefresh;
-        })
+        });
 
-        let hintBtns = [];
         for(let i=0; i < 7; ++i)
         {
             let index = i + 1;
@@ -238,9 +234,9 @@
             btn.addEventListener('click',(event)=>  {
                 axiosGame.put(`/hintNumber/${index}`);
             });
+
             hintBtns.push(btn);
         }
-
 
         document.getElementById('hintPickerHolder').replaceChildren(...hintBtns);
        
@@ -249,7 +245,7 @@
         });
        
         nextRoundButton.addEventListener('click', (event)=> {
-        axiosGame.put('/nextRound'); 
+            axiosGame.put('/nextRound'); 
         });
 
     </script>
