@@ -49,7 +49,8 @@
         let responsesHolder = document.getElementById('responsesHolder');
         let nextRoundButton = document.getElementById('nextRoundButton');
         let resetButton = document.getElementById("reset");
-        
+        let lastFrame = -1;
+
         let playerId = 0;
         let chefId = -1;
         let question = null;
@@ -116,87 +117,93 @@
             {
                 const res = await axiosGame.get(`/refresh/${playerId}`);
                 console.log(res);
-                const srvChef = Number(res.data.chefId);
-                if (res.data.question) {
-                    question = res.data.question;
-                    questionLabel.textContent = question;
-                }
-                else
-                {
-                    questionLabel.textContent = '';
-                }
-                
-                if(srvChef !== chefId)
-                {
-                    chefId = srvChef;
-                    if(chefId) {
-                        if(chefId === playerId) {
-                            chefLabel.replaceChildren(`you're ${GetNameFromId(playerId)}, the game master`);
-                        } else 
-                        {
-                            chefLabel.replaceChildren(`The game master is ${GetNameFromId(chefId)}`);
-                        }
-                    }
-                    else {
-                        chefLabel.replaceChildren(becomeChefButton);
-                        setVisibility(emojiPicker, false);
-                    }
-                }
-
-                setVisibility(playerLabel, chefId !== playerId);
-
-                hintNumber = res.data.hintNumber;
-                hints = res.data.hints;
-
-                if(chefId === playerId) {
-                    if (hintNumber === 0) {
-                        setVisibility(hintPicker, true);
-                        setVisibility(nextRoundButton, false);
-                    }
-                    else {
-                        setVisibility(hintPicker, false);
-                        setVisibility(emojiPicker, hints.length < hintNumber)
+                if(lastFrame !== res.data.frame) {
                     
-                        setVisibility(nextRoundButton, hints.length >= hintNumber);
+                    
+                    lastFrame = res.data.frame;
+                    
+                    const srvChef = Number(res.data.chefId);
+                    if (res.data.question) {
+                        question = res.data.question;
+                        questionLabel.textContent = question;
                     }
-                }
-                else {
-                    setVisibility(nextRoundButton, false);
-                }
-
-                if (hintNumber === 0) {
-                    setVisibility(hintHolder, false);
-                    setVisibility(responsesHolder, false);
-                }
-                else
-                {
-                    setVisibility(hintHolder, true);
-
-                    if (hintHolder.childNodes.length !== hintNumber) {
-                        let hintItems = [];
-                        for (let i = 0; i < hintNumber; ++i){
-                            const hint = document.createElement('div');
-                            hint.id = "hint";
-                            hintItems.push(hint);
-                        }
-
-                        hintHolder.replaceChildren(...hintItems);
+                    else
+                    {
+                        questionLabel.textContent = '';
                     }
-
-                    for (let i = 0; i < hintNumber; ++i) {
-                        const hintItem = hintHolder.childNodes[i];
-                        if (i < hints.length) {
-                            let emo = document.createElement('p');
-                            emo.textContent = hints[i];
-
-                            hintItem.replaceChildren(emo);
+                    
+                    if(srvChef !== chefId)
+                    {
+                        chefId = srvChef;
+                        if(chefId) {
+                            if(chefId === playerId) {
+                                chefLabel.replaceChildren(`you're ${GetNameFromId(playerId)}, the game master`);
+                            } else 
+                            {
+                                chefLabel.replaceChildren(`The game master is ${GetNameFromId(chefId)}`);
+                            }
                         }
                         else {
-                            hintItem.replaceChildren("");
+                            chefLabel.replaceChildren(becomeChefButton);
+                            setVisibility(emojiPicker, false);
                         }
                     }
+                    
+                    setVisibility(playerLabel, chefId !== playerId);
 
-                    setVisibility(responsesHolder, playerId !== chefId);
+                    hintNumber = res.data.hintNumber;
+                    hints = res.data.hints;
+                    
+                    if(chefId === playerId) {
+                        if (hintNumber === 0) {
+                            setVisibility(hintPicker, true);
+                            setVisibility(nextRoundButton, false);
+                        }
+                        else {
+                            setVisibility(hintPicker, false);
+                            setVisibility(emojiPicker, hints.length < hintNumber)
+                            
+                            setVisibility(nextRoundButton, hints.length >= hintNumber);
+                        }
+                    }
+                    else {
+                        setVisibility(nextRoundButton, false);
+                    }
+                    
+                    if (hintNumber === 0) {
+                        setVisibility(hintHolder, false);
+                        setVisibility(responsesHolder, false);
+                    }
+                    else
+                    {
+                        setVisibility(hintHolder, true);
+
+                        if (hintHolder.childNodes.length !== hintNumber) {
+                            let hintItems = [];
+                            for (let i = 0; i < hintNumber; ++i){
+                                const hint = document.createElement('div');
+                                hint.id = "hint";
+                                hintItems.push(hint);
+                            }
+                            
+                            hintHolder.replaceChildren(...hintItems);
+                        }
+                        
+                        for (let i = 0; i < hintNumber; ++i) {
+                            const hintItem = hintHolder.childNodes[i];
+                            if (i < hints.length) {
+                                let emo = document.createElement('p');
+                                emo.textContent = hints[i];
+                                
+                                hintItem.replaceChildren(emo);
+                            }
+                            else {
+                                hintItem.replaceChildren("");
+                            }
+                        }
+                        
+                        setVisibility(responsesHolder, playerId !== chefId);
+                    }
                 }
             }
 
@@ -206,7 +213,7 @@
         resetButton.addEventListener('click',(event)=> {
             axiosGame.put('/reset');
         });
-
+        
         let pauseButton = document.getElementById('pause');
         pauseButton.addEventListener('click', ()=> {
             pauseRefresh = !pauseRefresh;
