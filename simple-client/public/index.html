@@ -1,7 +1,8 @@
 <html>
     <link href="style.css" rel="stylesheet" type="text/css">
     <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
-    <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
+    <!-- <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script> -->
+    <script src="bxios.js"></script>
     <script src="js/Utils.js"></script>
     <script src="js/Pseudonymous.js"></script>
     <script src="js/PseudoPicker.js"></script>
@@ -73,7 +74,7 @@
             })
         }
 
-        const axiosGame = axios.create({
+        const axiosGame = bxios.create({
             baseURL: gameSrvUrl,
         });
         
@@ -155,7 +156,7 @@
                     {
                         setVisibility(hintHolder, true);
 
-                        const numberOfHintItem = Math.max(1, hints.length);
+                        const numberOfHintItem = hints.length + 1;
                         if (hintHolder.childNodes.length !== numberOfHintItem) {
                             let hintItems = [];
                             for (let i = 0; i < numberOfHintItem; ++i){

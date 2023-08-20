@@ -31,7 +31,6 @@ app.get('/chefId/', (req, res) => {
 app.get('/refresh/:playerId', (req, res)=> {
     let response = { 
         chefId: currentChefId,
-        hintNumber: hintNumber,
         hints: hints,
         scores,
         roundResults,
