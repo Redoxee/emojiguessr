@@ -18,15 +18,11 @@
                 <p>Select a name</p>
             </div>
             <div id='questionLabel'></div>
-            <div id='hintPicker'>
-                <p>In how many emoji can you make it guess ?</p>
-                <div id="hintPickerHolder"></div>
-            </div>
-            <button id="nextRoundButton">Next Round</button>
             <div id="hintHolder"></div>
             <emoji-picker></emoji-picker>
             <div id="responsesHolder"></div>
         </div>
+        <button id="nextRoundButton">Next Round</button>
         <div id="credits">Made by AntonMakesGames with help from François Eoche</div>
         <div id='debug'>
             <button id="reset">R</button>
@@ -44,7 +40,6 @@
         let chefLabel = document.getElementById('chefLabel');
         let questionLabel = document.getElementById('questionLabel');
         let emojiPicker =document.querySelector('emoji-picker'); 
-        let hintPicker = document.getElementById('hintPicker');
         let hintHolder = document.getElementById('hintHolder');
         let responsesHolder = document.getElementById('responsesHolder');
         let nextRoundButton = document.getElementById('nextRoundButton');
@@ -55,13 +50,11 @@
         let chefId = -1;
         let question = null;
         let refreshRate = 2000;
-        let hintNumber = 0;
         let hints = [];
         let pauseRefresh = false;
         let hintBtns = [];
 
         setVisibility(emojiPicker, false);
-        setVisibility(hintPicker, false);
         setVisibility(playerLabel, false);
         setVisibility(responsesHolder, false);
         setVisibility(nextRoundButton, false);
@@ -118,8 +111,6 @@
                 const res = await axiosGame.get(`/refresh/${playerId}`);
                 console.log(res);
                 if(lastFrame !== res.data.frame) {
-                    
-                    
                     lastFrame = res.data.frame;
                     
                     const srvChef = Number(res.data.chefId);
@@ -151,36 +142,23 @@
                     
                     setVisibility(playerLabel, chefId !== playerId);
 
-                    hintNumber = res.data.hintNumber;
                     hints = res.data.hints;
                     
                     if(chefId === playerId) {
-                        if (hintNumber === 0) {
-                            setVisibility(hintPicker, true);
-                            setVisibility(nextRoundButton, false);
-                        }
-                        else {
-                            setVisibility(hintPicker, false);
-                            setVisibility(emojiPicker, hints.length < hintNumber)
-                            
-                            setVisibility(nextRoundButton, hints.length >= hintNumber);
-                        }
+                        setVisibility(emojiPicker, true)
+                        setVisibility(nextRoundButton, true);
                     }
                     else {
                         setVisibility(nextRoundButton, false);
                     }
                     
-                    if (hintNumber === 0) {
-                        setVisibility(hintHolder, false);
-                        setVisibility(responsesHolder, false);
-                    }
-                    else
                     {
                         setVisibility(hintHolder, true);
 
-                        if (hintHolder.childNodes.length !== hintNumber) {
+                        const numberOfHintItem = Math.max(1, hints.length);
+                        if (hintHolder.childNodes.length !== numberOfHintItem) {
                             let hintItems = [];
-                            for (let i = 0; i < hintNumber; ++i){
+                            for (let i = 0; i < numberOfHintItem; ++i){
                                 const hint = document.createElement('div');
                                 hint.id = "hint";
                                 hintItems.push(hint);
@@ -189,7 +167,7 @@
                             hintHolder.replaceChildren(...hintItems);
                         }
                         
-                        for (let i = 0; i < hintNumber; ++i) {
+                        for (let i = 0; i < numberOfHintItem; ++i) {
                             const hintItem = hintHolder.childNodes[i];
                             if (i < hints.length) {
                                 let emo = document.createElement('p');
@@ -219,20 +197,6 @@
             pauseRefresh = !pauseRefresh;
         });
 
-        for(let i=0; i < 7; ++i)
-        {
-            let index = i + 1;
-            const btn = document.createElement('button');
-            btn.textContent = '' + index;
-            btn.addEventListener('click',(event)=>  {
-                axiosGame.put(`/hintNumber/${index}`);
-            });
-
-            hintBtns.push(btn);
-        }
-
-        document.getElementById('hintPickerHolder').replaceChildren(...hintBtns);
-       
         emojiPicker.addEventListener('emoji-click', (event)=>{
             axiosGame.put(`/hint/${event.detail.unicode}`);
         });

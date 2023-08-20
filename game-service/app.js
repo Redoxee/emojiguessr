@@ -13,20 +13,14 @@ let frame = 1;
 let selectedAnswer = 0;
 let currentChefId = 0;
 
-let hintNumber = 0;
 let hints = [];
 let roundResults = {};
 let scores = {};
-
-function generatePlayerID(){
-    return Date.now();
-}
 
 function selectNew() {
     selectedAnswer =  Math.floor(Math.random() * selectedContent.length);
     hints = [];
     roundResults = {};
-    hintNumber = 0;
     frame++;
 }
 
@@ -68,12 +62,6 @@ app.put('/nextRound',(req, res) => {
     res.status(200);
 });
 
-app.put('/hintNumber/:hintNumber', (req, res)=> {
-    hintNumber = req.params.hintNumber;
-    frame++;
-    res.status(200);
-});
-
 app.put('/reset', (req, res)=> {
     currentChefId = 0;
     selectNew();
@@ -84,9 +72,7 @@ app.put('/reset', (req, res)=> {
 });
 
 app.put('/hint/:hint',(req, res)=>{
-    if(hints.length < hintNumber) {
-        hints.push(req.params.hint);
-    }
+    hints.push(req.params.hint);
     
     frame++;
     res.status(200);
@@ -101,7 +87,7 @@ app.put('/response/:playerId/:responseIndex', (req, res)=>{
         if(responseIndex == selectedAnswer) {
             console.log(`Player ${playerId} found the correct response ${responseIndex} ${selectedContent[responseIndex]}`);
             
-            let score = Math.max(0, 15 - hintNumber + 8 - hints.length + 15 - Object.keys(roundResults).length);
+            let score = Math.max(0, 8 - hints.length + 15 - Object.keys(roundResults).length);
             roundResults[playerId] = score;
             
             const chefScore = Math.floor(score / 2);
