@@ -646,7 +646,7 @@ const pseudonimous_data : string[][]= [
 		"Dragonfly",
 		"Hornet",
 		"Fly",
-		"Katydid",
+		"Bobcat",
 		"Ladybug",
 		"Millipede",
 		"Mite",

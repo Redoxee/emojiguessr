@@ -1,12 +1,16 @@
 <html>
     <link href="style.css" rel="stylesheet" type="text/css">
     <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
-    <!-- <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script> -->
-    <script src="bxios.js"></script>
+    <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
+    <!-- <script src="bxios.js"></script> -->
     <script src="js/Utils.js"></script>
     <script src="js/Pseudonymous.js"></script>
     <script src="js/PseudoPicker.js"></script>
+    <script src="js/GuessingTextFieldModule.js"></script>
+    <script src="js/KeyboardModule.js"></script>
     <link href="css/PseudoPicker.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="css/GuessingTextFieldModule.css">
+    <link rel="stylesheet" href="css/KeyboardModule.css">
 
     <body>
         <div id="game">
@@ -18,10 +22,10 @@
             <div id = "NameBuilder">
                 <p>Select a name</p>
             </div>
-            <div id='questionLabel'></div>
             <div id="hintHolder"></div>
+            <div id='questionLabel'></div>
             <emoji-picker></emoji-picker>
-            <div id="responsesHolder"></div>
+            <div id="inputHolder"></div>
         </div>
         <button id="nextRoundButton">Next Round</button>
         <div id="credits">Made by AntonMakesGames with help from François Eoche</div>
@@ -34,6 +38,9 @@
     <script type="text/javascript">
         // const gameSrvUrl = "https://antonmakesgames.alwaysdata.net/";
         const gameSrvUrl = "http://localhost:8100";
+        const axiosGame = axios.create({
+            baseURL: gameSrvUrl,
+        });
         
         const nameBuilderElement = document.getElementById('NameBuilder');
 
@@ -42,7 +49,7 @@
         let questionLabel = document.getElementById('questionLabel');
         let emojiPicker =document.querySelector('emoji-picker'); 
         let hintHolder = document.getElementById('hintHolder');
-        let responsesHolder = document.getElementById('responsesHolder');
+        let inputHolder = document.getElementById('inputHolder');
         let nextRoundButton = document.getElementById('nextRoundButton');
         let resetButton = document.getElementById("reset");
         let lastFrame = -1;
@@ -54,12 +61,14 @@
         let hints = [];
         let pauseRefresh = false;
         let hintBtns = [];
+        let guessingField = create_guessing_field_element();
+        let keyboardModule = create_keyboard_element("azerty");
 
         setVisibility(emojiPicker, false);
         setVisibility(playerLabel, false);
-        setVisibility(responsesHolder, false);
         setVisibility(nextRoundButton, false);
-
+        setVisibility(inputHolder, false);
+        
         {
             const pseudonymPicker = create_pseudonyme_picker();
             nameBuilderElement.appendChild(pseudonymPicker);
@@ -73,38 +82,29 @@
                 refresh();
             })
         }
-
-        const axiosGame = bxios.create({
-            baseURL: gameSrvUrl,
-        });
         
         window.addEventListener("load", async () => {
             const res = await axiosGame.get();
             console.log(res);
             
             const responses = res.data.responses;
-
-            let responsesBtn = [];
-            for (let i= 0; i < responses.length; ++i){
-                const index = i;
-                const responseButton = document.createElement('button');
-                responseButton.textContent = responses[index];
-                responseButton.addEventListener('click',()=>{
-                    axiosGame.put(`/response/${playerId}/${index}`);
-                });
-
-                responsesBtn.push(responseButton);
-            }
-
-            responsesHolder.replaceChildren(...responsesBtn);
         });
-
+        
         const becomeChefButton = document.createElement('Button');
         becomeChefButton.id = "chefButton";
         becomeChefButton.textContent = "I'm the game master"; 
         becomeChefButton.addEventListener('click', (event)=>{
             axiosGame.put(`/chefId/${playerId}`);
         });
+        
+        questionLabel.replaceChildren(guessingField);
+        
+        inputHolder.replaceChildren(keyboardModule);
+		keyboardModule.addEventListener("OnCustomKeyBoardInput", e => {
+            if (playerId !== chefId) {
+                guessingField.input(e.detail);
+            }
+		});
 
         async function refresh() {
             if(playerId && !pauseRefresh)
@@ -117,11 +117,15 @@
                     const srvChef = Number(res.data.chefId);
                     if (res.data.question) {
                         question = res.data.question;
-                        questionLabel.textContent = question;
+                        if (guessingField.pattern !== res.data.question) {
+                            guessingField.configure(res.data.question, true);
+                        }
                     }
                     else
                     {
-                        questionLabel.textContent = '';
+                        if (guessingField.pattern !== res.data.hintifiedAnswer) {
+                            guessingField.configure(res.data.hintifiedAnswer);
+                        }
                     }
                     
                     if(srvChef !== chefId)
@@ -148,9 +152,11 @@
                     if(chefId === playerId) {
                         setVisibility(emojiPicker, true)
                         setVisibility(nextRoundButton, true);
+                        setVisibility(inputHolder, false);
                     }
                     else {
                         setVisibility(nextRoundButton, false);
+                        setVisibility(inputHolder, true);
                     }
                     
                     {
@@ -180,8 +186,6 @@
                                 hintItem.replaceChildren("");
                             }
                         }
-                        
-                        setVisibility(responsesHolder, playerId !== chefId);
                     }
                 }
             }

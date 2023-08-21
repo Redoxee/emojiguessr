@@ -11,14 +11,32 @@ let selectedContent = content[content.selected_content];
 let frame = 1;
 
 let selectedAnswer = 0;
+let hintifiedAnswer = "";
 let currentChefId = 0;
 
 let hints = [];
 let roundResults = {};
 let scores = {};
 
+var allowedChars = /[a-z]|[éèç]/gi;
+
+function hintify(source) {
+    let result = "";
+    for (let index = 0; index < source.length; ++index) {
+        if(source[index].match(allowedChars)) {
+            result += 'x';
+        }
+        else {
+            result += source[index];
+        }
+    }
+
+    return result;
+}
+
 function selectNew() {
     selectedAnswer =  Math.floor(Math.random() * selectedContent.length);
+    hintifiedAnswer = hintify(selectedContent[selectedAnswer]);
     hints = [];
     roundResults = {};
     frame++;
@@ -34,6 +52,7 @@ app.get('/refresh/:playerId', (req, res)=> {
         hints: hints,
         scores,
         roundResults,
+        hintifiedAnswer,
         frame
     };
     const playerId = req.params.playerId;

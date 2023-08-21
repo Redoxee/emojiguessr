@@ -6,17 +6,18 @@ function create_guessing_field_element() {
     guessingField.cursor = 0;
     guessingField.value = "";
     guessingField.length = 0;
-    var allowedChars = /[a-z]|[éè]/gi;
+    var allowedChars = /[a-z]|[éèç]/gi;
     for (let index = 0; index < 200; ++index) {
         const letter = document.createElement("div");
         letter.className = "guessing-letter";
         guessingField.letterPool.push(letter);
     }
-    guessingField.configure = function (pattern) {
+    guessingField.configure = function (pattern, forceDisplay) {
         this.replaceChildren();
         this.cursor = 0;
         this.value = "";
         this.length = pattern.length;
+        this.pattern = pattern;
         if (this.length >= this.letterPool.length) {
             console.log("pattern is too long");
             return;
@@ -25,14 +26,18 @@ function create_guessing_field_element() {
             const char = pattern[index];
             let found = char.match(allowedChars);
             const letter = this.letterPool[index];
-            if (found) {
+            if (found && !forceDisplay) {
                 letter.id = "letter";
+                letter.textContent = "_";
             }
-            else {
+            else if (char === ' ') {
                 letter.id = "filler";
             }
+            else {
+                letter.id = "fillerChar";
+                letter.textContent = char;
+            }
             ;
-            letter.textContent = "_";
             this.appendChild(letter);
         }
     };

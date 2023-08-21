@@ -32,3 +32,11 @@
 #filler {
 	visibility: hidden;
 }
+
+#fillerChar {
+	border: 0px;
+	background-color: white;
+	border-radius: 5px;
+	text-align: center;
+	padding: 0.5rem;
+}

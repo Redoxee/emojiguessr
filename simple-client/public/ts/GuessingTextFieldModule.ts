@@ -3,7 +3,8 @@ interface GuessingField extends HTMLDivElement {
 	cursor : number;
 	length : number;
 	value : String;
-	configure(pattern : string):void;
+	pattern : String;
+	configure(pattern : string, forceDisplay: boolean):void;
 	input(ch : string):void;
 }
 
@@ -15,7 +16,7 @@ function create_guessing_field_element() : GuessingField {
 	guessingField.value = "";
 	guessingField.length = 0; 
 
-	var allowedChars = /[a-z]|[éè]/gi;
+	var allowedChars = /[a-z]|[éèç]/gi;
 
 	for (let index = 0; index < 200; ++index) {
 		const letter = document.createElement("div");
@@ -23,12 +24,13 @@ function create_guessing_field_element() : GuessingField {
 		guessingField.letterPool.push(letter);
 	}
 
-	guessingField.configure = function (pattern: string):void {
+	guessingField.configure = function (pattern: string, forceDisplay: boolean):void {
 		this.replaceChildren();
 		
 		this.cursor = 0;
 		this.value = "";
 		this.length = pattern.length;
+		this.pattern = pattern;
 
 		if(this.length >= this.letterPool.length)
 		{
@@ -40,14 +42,18 @@ function create_guessing_field_element() : GuessingField {
 			const char = pattern[index];
 			let found = char.match(allowedChars);
 			const letter = this.letterPool[index];
-			if (found) {
+			if (found && !forceDisplay) {
 				letter.id = "letter";
+				letter.textContent = "_";
+			}
+			else if(char === ' '){
+				letter.id = "filler";
 			}
 			else {
-				letter.id = "filler";
+				letter.id = "fillerChar";
+				letter.textContent = char;
 			};
 			
-			letter.textContent = "_";
 
 			this.appendChild(letter);
 		}
