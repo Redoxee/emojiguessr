@@ -18,7 +18,7 @@ let hints = [];
 let roundResults = {};
 let scores = {};
 
-var allowedChars = /[a-z]|[éèç]/gi;
+var allowedChars = /[a-z]|[éè]/gi;
 
 function hintify(source) {
     let result = "";
@@ -92,6 +92,11 @@ app.put('/reset', (req, res)=> {
 app.put('/hint/:hint',(req, res)=>{
     hints.push(req.params.hint);
     
+    frame++;
+    res.status(200);
+});
+
+app.put('/guess/:playerId/:answer', (req, res)=>{
     frame++;
     res.status(200);
 });

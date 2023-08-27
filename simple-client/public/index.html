@@ -106,6 +106,20 @@
             }
 		});
 
+		guessingField.addEventListener("submit", _=>{
+            const guess = guessingField.value.trim();
+            console.log(`sending ${guess} ${guess.length}, ${guessingField.pattern.length}`);
+            if(guess.length === 0) {
+                return;
+            }
+
+            if (guess.length !== guessingField.pattern.length) {
+                return;
+            }
+
+            axiosGame.put(`/guess/${playerId}/${guess}`);
+		});
+
         async function refresh() {
             if(playerId && !pauseRefresh)
             {
