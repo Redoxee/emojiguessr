@@ -3,14 +3,18 @@ function create_guessing_field_element() {
     const guessingField = document.createElement("div");
     guessingField.className = "guessing-field";
     guessingField.letterPool = [];
+    guessingField.wordContainers = [];
     guessingField.cursor = 0;
     guessingField.value = "";
     guessingField.length = 0;
-    var allowedChars = /[a-z]|[éèç]/gi;
+    var allowedChars = /[a-z]|[éè]/gi;
     for (let index = 0; index < 200; ++index) {
         const letter = document.createElement("div");
         letter.className = "guessing-letter";
         guessingField.letterPool.push(letter);
+        const wordContainer = document.createElement("div");
+        wordContainer.id = "guessingWord";
+        guessingField.wordContainers.push(wordContainer);
     }
     guessingField.configure = function (pattern, forceDisplay) {
         this.replaceChildren();
@@ -18,6 +22,8 @@ function create_guessing_field_element() {
         this.value = "";
         this.length = pattern.length;
         this.pattern = pattern;
+        let wordCount = 0;
+        let currentWord = this.wordContainers[wordCount];
         if (this.length >= this.letterPool.length) {
             console.log("pattern is too long");
             return;
@@ -29,17 +35,23 @@ function create_guessing_field_element() {
             if (found && !forceDisplay) {
                 letter.id = "letter";
                 letter.textContent = "_";
+                currentWord.appendChild(letter);
             }
             else if (char === ' ') {
                 letter.id = "filler";
+                this.appendChild(currentWord);
+                wordCount++;
+                currentWord = this.wordContainers[wordCount];
+                this.appendChild(letter);
             }
             else {
                 letter.id = "fillerChar";
                 letter.textContent = char;
+                currentWord.appendChild(letter);
             }
             ;
-            this.appendChild(letter);
         }
+        this.append(currentWord);
     };
     guessingField.input = function (input) {
         if (input === "enter") {

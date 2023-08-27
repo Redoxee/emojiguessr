@@ -1,5 +1,6 @@
 interface GuessingField extends HTMLDivElement {
 	letterPool:HTMLElement[];
+	wordContainers : HTMLDivElement[];
 	cursor : number;
 	length : number;
 	value : String;
@@ -12,16 +13,21 @@ function create_guessing_field_element() : GuessingField {
 	const guessingField = <GuessingField> document.createElement("div");
 	guessingField.className = "guessing-field";
 	guessingField.letterPool = [];
+	guessingField.wordContainers = [];
 	guessingField.cursor = 0;
 	guessingField.value = "";
 	guessingField.length = 0; 
 
-	var allowedChars = /[a-z]|[éèç]/gi;
+	var allowedChars = /[a-z]|[éè]/gi;
 
 	for (let index = 0; index < 200; ++index) {
 		const letter = document.createElement("div");
 		letter.className = "guessing-letter";
 		guessingField.letterPool.push(letter);
+
+		const wordContainer = document.createElement("div");
+		wordContainer.id = "guessingWord";
+		guessingField.wordContainers.push(wordContainer);
 	}
 
 	guessingField.configure = function (pattern: string, forceDisplay: boolean):void {
@@ -31,6 +37,8 @@ function create_guessing_field_element() : GuessingField {
 		this.value = "";
 		this.length = pattern.length;
 		this.pattern = pattern;
+		let wordCount : number = 0;
+		let currentWord : HTMLDivElement = this.wordContainers[wordCount];
 
 		if(this.length >= this.letterPool.length)
 		{
@@ -45,18 +53,23 @@ function create_guessing_field_element() : GuessingField {
 			if (found && !forceDisplay) {
 				letter.id = "letter";
 				letter.textContent = "_";
+				currentWord.appendChild(letter);
 			}
 			else if(char === ' '){
 				letter.id = "filler";
+				this.appendChild(currentWord);
+				wordCount++;
+				currentWord = this.wordContainers[wordCount];
+				this.appendChild(letter);
 			}
 			else {
 				letter.id = "fillerChar";
 				letter.textContent = char;
+				currentWord.appendChild(letter);
 			};
-			
-
-			this.appendChild(letter);
 		}
+
+		this.append(currentWord);
 	};
 
 	guessingField.input = function(input : string): void {
