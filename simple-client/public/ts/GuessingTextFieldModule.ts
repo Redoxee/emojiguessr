@@ -39,6 +39,7 @@ function create_guessing_field_element() : GuessingField {
 		this.pattern = pattern;
 		let wordCount : number = 0;
 		let currentWord : HTMLDivElement = this.wordContainers[wordCount];
+		currentWord.replaceChildren();
 
 		if(this.length >= this.letterPool.length)
 		{
@@ -56,11 +57,14 @@ function create_guessing_field_element() : GuessingField {
 				currentWord.appendChild(letter);
 			}
 			else if(char === ' '){
-				letter.id = "filler";
 				this.appendChild(currentWord);
+
+				letter.id = "filler";
+				this.appendChild(letter);
+				
 				wordCount++;
 				currentWord = this.wordContainers[wordCount];
-				this.appendChild(letter);
+				currentWord.replaceChildren();
 			}
 			else {
 				letter.id = "fillerChar";
@@ -70,6 +74,11 @@ function create_guessing_field_element() : GuessingField {
 		}
 
 		this.append(currentWord);
+
+		while(this.cursor < this.letterPool.length && this.letterPool[this.cursor].id !== "letter") {
+			this.value += " ";
+			this.cursor++;
+		}
 	};
 
 	guessingField.input = function(input : string): void {

@@ -24,6 +24,7 @@ function create_guessing_field_element() {
         this.pattern = pattern;
         let wordCount = 0;
         let currentWord = this.wordContainers[wordCount];
+        currentWord.replaceChildren();
         if (this.length >= this.letterPool.length) {
             console.log("pattern is too long");
             return;
@@ -38,11 +39,12 @@ function create_guessing_field_element() {
                 currentWord.appendChild(letter);
             }
             else if (char === ' ') {
-                letter.id = "filler";
                 this.appendChild(currentWord);
+                letter.id = "filler";
+                this.appendChild(letter);
                 wordCount++;
                 currentWord = this.wordContainers[wordCount];
-                this.appendChild(letter);
+                currentWord.replaceChildren();
             }
             else {
                 letter.id = "fillerChar";
@@ -52,6 +54,10 @@ function create_guessing_field_element() {
             ;
         }
         this.append(currentWord);
+        while (this.cursor < this.letterPool.length && this.letterPool[this.cursor].id !== "letter") {
+            this.value += " ";
+            this.cursor++;
+        }
     };
     guessingField.input = function (input) {
         if (input === "enter") {

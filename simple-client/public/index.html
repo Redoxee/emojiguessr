@@ -79,7 +79,6 @@
                 playerLabel.replaceChildren(`You're ${event.detail.name}`);
                 setVisibility(playerLabel, true);
                 setVisibility(nameBuilderElement, false);
-                refresh();
             })
         }
         
@@ -204,9 +203,9 @@
                 }
             }
 
-            setTimeout(refresh, refreshRate);
+//            setTimeout(refresh, refreshRate);
         }
-
+        setInterval(refresh, refreshRate)
         resetButton.addEventListener('click',(event)=> {
             axiosGame.put('/reset');
         });

@@ -55,9 +55,9 @@ body {
 
 #hint > * {
     margin:0%;
-    vertical-align: text-top;
     height: 100%;
     font-size: 6em;
+    text-align: center;
 }
 
 #hintHolder {
