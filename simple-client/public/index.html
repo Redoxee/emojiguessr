@@ -7,10 +7,12 @@
     <script src="js/Pseudonymous.js"></script>
     <script src="js/PseudoPicker.js"></script>
     <script src="js/GuessingTextFieldModule.js"></script>
-    <script src="js/KeyboardModule.js"></script>
-    <link href="css/PseudoPicker.css" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="css/GuessingTextFieldModule.css">
+    <script src="js/KeyboardModule.js"></script>
     <link rel="stylesheet" href="css/KeyboardModule.css">
+    <script src="js/SparkExplosion.js"></script>
+    <link rel="stylesheet" href="css/SparkExplosion.css">
+    <link href="css/PseudoPicker.css" rel="stylesheet" type="text/css">
 
     <body>
         <div id="game">
@@ -79,7 +81,7 @@
                 playerLabel.replaceChildren(`You're ${event.detail.name}`);
                 setVisibility(playerLabel, true);
                 setVisibility(nameBuilderElement, false);
-            })
+            });
         }
         
         window.addEventListener("load", async () => {
