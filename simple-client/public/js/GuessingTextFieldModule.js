@@ -1,4 +1,10 @@
 "use strict";
+var CharType;
+(function (CharType) {
+    CharType[CharType["Letter"] = 0] = "Letter";
+    CharType[CharType["Filler"] = 1] = "Filler";
+    CharType[CharType["FillerChar"] = 2] = "FillerChar";
+})(CharType || (CharType = {}));
 function create_guessing_field_element() {
     const guessingField = document.createElement("div");
     guessingField.className = "guessing-field";
@@ -7,13 +13,20 @@ function create_guessing_field_element() {
     guessingField.cursor = 0;
     guessingField.value = "";
     guessingField.length = 0;
-    var allowedChars = /[a-z]|[éè]/gi;
+    const allowedChars = /[a-z]|[éè]/gi;
+    const letterClassName = "guessing-letter letter";
+    const letterFilledClassName = "guessing-letter letter filled";
+    const fillerClassName = "guessing-letter filler";
+    const fillerCharClassName = "guessing-letter filler-char";
     for (let index = 0; index < 200; ++index) {
         const letter = document.createElement("div");
-        letter.className = "guessing-letter";
+        const letterContent = document.createElement("div");
+        letterContent.className = "content";
+        letter.content = letterContent;
+        letter.appendChild(letterContent);
         guessingField.letterPool.push(letter);
         const wordContainer = document.createElement("div");
-        wordContainer.id = "guessingWord";
+        wordContainer.className = "guessing-word";
         guessingField.wordContainers.push(wordContainer);
     }
     guessingField.configure = function (pattern, forceDisplay) {
@@ -34,27 +47,30 @@ function create_guessing_field_element() {
             let found = char.match(allowedChars);
             const letter = this.letterPool[index];
             if (found && !forceDisplay) {
-                letter.id = "letter";
-                letter.textContent = "_";
+                letter.className = letterClassName;
+                letter.charType = CharType.Letter;
+                letter.content.textContent = "_";
                 currentWord.appendChild(letter);
             }
             else if (char === ' ') {
                 this.appendChild(currentWord);
-                letter.id = "filler";
+                letter.charType = CharType.Filler;
+                letter.className = fillerClassName;
                 this.appendChild(letter);
                 wordCount++;
                 currentWord = this.wordContainers[wordCount];
                 currentWord.replaceChildren();
             }
             else {
-                letter.id = "fillerChar";
-                letter.textContent = char;
+                letter.charType = CharType.FillerChar;
+                letter.className = fillerCharClassName;
+                letter.content.textContent = char;
                 currentWord.appendChild(letter);
             }
             ;
         }
         this.append(currentWord);
-        while (this.cursor < this.letterPool.length && this.letterPool[this.cursor].id !== "letter") {
+        while (this.cursor < this.letterPool.length && this.letterPool[this.cursor].charType !== CharType.Letter) {
             this.value += " ";
             this.cursor++;
         }
@@ -68,11 +84,16 @@ function create_guessing_field_element() {
             if (this.cursor > 0) {
                 this.value = this.value.substring(0, this.value.length - 1);
                 this.cursor--;
-                while (this.letterPool[this.cursor].id !== "letter" && this.cursor > 0) {
+                let letter = this.letterPool[this.cursor];
+                while (letter.charType !== CharType.Letter && this.cursor > 0) {
                     this.value = this.value.substring(0, this.value.length - 1);
                     this.cursor--;
+                    letter = this.letterPool[this.cursor];
                 }
-                this.letterPool[this.cursor].textContent = "_";
+                if (letter.charType === CharType.Letter) {
+                    letter.content.textContent = "_";
+                    letter.className = letterClassName;
+                }
             }
             return;
         }
@@ -88,12 +109,18 @@ function create_guessing_field_element() {
             console.log(`wrong input "${input}"`);
             return;
         }
-        this.value += input;
-        this.letterPool[this.cursor].textContent = input;
-        this.cursor++;
-        while (this.cursor < this.letterPool.length && this.letterPool[this.cursor].id !== "letter") {
-            this.value += " ";
+        {
+            this.value += input;
+            let letter = this.letterPool[this.cursor];
+            letter.content.textContent = input;
+            letter.className = letterFilledClassName;
             this.cursor++;
+            letter = this.letterPool[this.cursor];
+            while (this.cursor < this.letterPool.length && letter.charType !== CharType.Letter) {
+                this.value += " ";
+                this.cursor++;
+                letter = this.letterPool[this.cursor];
+            }
         }
     };
     return guessingField;

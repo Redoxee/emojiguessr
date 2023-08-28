@@ -1,5 +1,16 @@
+enum CharType {
+	Letter,
+	Filler,
+	FillerChar
+}
+
+interface LetterHolder extends HTMLDivElement {
+	content: HTMLElement;
+	charType: CharType;
+}
+
 interface GuessingField extends HTMLDivElement {
-	letterPool:HTMLElement[];
+	letterPool: LetterHolder[];
 	wordContainers : HTMLDivElement[];
 	cursor : number;
 	length : number;
@@ -17,16 +28,24 @@ function create_guessing_field_element() : GuessingField {
 	guessingField.cursor = 0;
 	guessingField.value = "";
 	guessingField.length = 0; 
-
-	var allowedChars = /[a-z]|[éè]/gi;
+	
+	const allowedChars = /[a-z]|[éè]/gi;
+	const letterClassName = "guessing-letter letter";
+	const letterFilledClassName = "guessing-letter letter filled";
+	const fillerClassName = "guessing-letter filler";
+	const fillerCharClassName = "guessing-letter filler-char";
 
 	for (let index = 0; index < 200; ++index) {
-		const letter = document.createElement("div");
-		letter.className = "guessing-letter";
+		const letter = document.createElement("div") as LetterHolder;
+		const letterContent = document.createElement("div");
+		letterContent.className = "content";
+		letter.content = letterContent;
+		letter.appendChild(letterContent);
+
 		guessingField.letterPool.push(letter);
 
 		const wordContainer = document.createElement("div");
-		wordContainer.id = "guessingWord";
+		wordContainer.className = "guessing-word";
 		guessingField.wordContainers.push(wordContainer);
 	}
 
@@ -52,14 +71,16 @@ function create_guessing_field_element() : GuessingField {
 			let found = char.match(allowedChars);
 			const letter = this.letterPool[index];
 			if (found && !forceDisplay) {
-				letter.id = "letter";
-				letter.textContent = "_";
+				letter.className = letterClassName;
+				letter.charType = CharType.Letter;
+				letter.content.textContent = "_";
 				currentWord.appendChild(letter);
 			}
 			else if(char === ' '){
 				this.appendChild(currentWord);
 
-				letter.id = "filler";
+				letter.charType = CharType.Filler;
+				letter.className = fillerClassName;
 				this.appendChild(letter);
 				
 				wordCount++;
@@ -67,15 +88,16 @@ function create_guessing_field_element() : GuessingField {
 				currentWord.replaceChildren();
 			}
 			else {
-				letter.id = "fillerChar";
-				letter.textContent = char;
+				letter.charType = CharType.FillerChar;
+				letter.className = fillerCharClassName;
+				letter.content.textContent = char;
 				currentWord.appendChild(letter);
 			};
 		}
 
 		this.append(currentWord);
 
-		while(this.cursor < this.letterPool.length && this.letterPool[this.cursor].id !== "letter") {
+		while(this.cursor < this.letterPool.length && this.letterPool[this.cursor].charType !== CharType.Letter) {
 			this.value += " ";
 			this.cursor++;
 		}
@@ -90,12 +112,17 @@ function create_guessing_field_element() : GuessingField {
 			{
 				this.value = this.value.substring(0, this.value.length - 1);
 				this.cursor--;
-				while( this.letterPool[this.cursor].id !== "letter" && this.cursor > 0){
+				let letter = this.letterPool[this.cursor];
+				while( letter.charType !== CharType.Letter && this.cursor > 0){
 					this.value = this.value.substring(0, this.value.length - 1);
 					this.cursor--;
+					letter = this.letterPool[this.cursor];
 				}
 
-				this.letterPool[this.cursor].textContent = "_";
+				if (letter.charType === CharType.Letter) {
+					letter.content.textContent = "_";
+					letter.className = letterClassName;
+				}
 			}
 
 			return;
@@ -115,12 +142,18 @@ function create_guessing_field_element() : GuessingField {
 			return;
 		}
 
-		this.value += input;
-		this.letterPool[this.cursor].textContent = input;
-		this.cursor++;
-		while(this.cursor < this.letterPool.length && this.letterPool[this.cursor].id !== "letter") {
-			this.value += " ";
+		{
+			this.value += input;
+			let letter = this.letterPool[this.cursor];
+			letter.content.textContent = input;
+			letter.className = letterFilledClassName;
 			this.cursor++;
+			letter = this.letterPool[this.cursor];
+			while(this.cursor < this.letterPool.length && letter.charType !== CharType.Letter) {
+				this.value += " ";
+				this.cursor++;
+				letter = this.letterPool[this.cursor];
+			}
 		}
 	}
 

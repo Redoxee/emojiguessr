@@ -9,9 +9,10 @@
 	background-color: lightgray;
 	max-width: 100%;
 	row-gap: .5em;
+	border-radius: 5px;
 }
 
-#guessingWord {
+.guessing-word {
 	display: flex;
 	flex-direction: row;
 	gap:.2em;
@@ -22,7 +23,22 @@
 	height: 1em;
 }
 
-#letter {
+.letter {
+	border: 0px;
+	background-color: white;
+	border-radius: 5px;
+	text-align: center;
+	padding: 0.5em;
+	position: relative;
+}
+
+.filled>.content {
+/* @keyframes duration | easing-function | delay |iteration-count | direction | fill-mode | play-state | name */
+	animation: 0.15s cubic-bezier(0.23, 1, 0.320, 1) 0s 1 forwards guessing-filled-input;
+	position: relative;
+}
+
+.filler-char {
 	border: 0px;
 	background-color: white;
 	border-radius: 5px;
@@ -30,16 +46,20 @@
 	padding: 0.5em;
 }
 
-#fillerChar {
-	border: 0px;
-	background-color: white;
-	border-radius: 5px;
-	text-align: center;
-	padding: 0.5em;
-}
-
-#filler {
+.filler {
 	visibility: hidden;
 	display: inline-block;
 	width: 1em;
+}
+
+@keyframes guessing-filled-input {
+	from {
+		top: -0.5em;
+		opacity: 0;
+	}
+
+	to {
+		top:0em;
+		opacity: 1;
+	}
 }
