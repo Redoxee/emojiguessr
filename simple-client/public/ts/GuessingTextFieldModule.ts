@@ -60,7 +60,7 @@ function create_guessing_field_element() : GuessingField {
 		wordContainer.className = "guessing-word";
 		guessingField.wordContainers.push(wordContainer);
 
-		letter.addEventListener("animationend",(ev)=>{
+		letter.addEventListener("animationend", (ev)=>{
 			if (ev.animationName === letterWrongAnswerClassName)
 			{
 				letter.classList.remove(letterWrongAnswerAnimationClassName);

@@ -25,6 +25,7 @@ function create_keyboard_element(layout_name : string) : KeyboardElement {
 	const input_event_name = "OnCustomKeyBoardInput";
 	const kb = <KeyboardElement>document.createElement("div");
 	kb.className = "keyboard";
+
 	layout.forEach(row => {
 		const rowElement = document.createElement("div");
 		rowElement.className="keyboard-row";
@@ -49,7 +50,7 @@ function create_keyboard_element(layout_name : string) : KeyboardElement {
 		});
 	});
 
-	document.addEventListener("keyup", (e) => {
+	const handleKeyboardEvent = (e: KeyboardEvent) : void => {
 		if(e.isComposing || e.ctrlKey) {
 			return;
 		}
@@ -70,6 +71,10 @@ function create_keyboard_element(layout_name : string) : KeyboardElement {
 			kb.dispatchEvent(new CustomEvent(input_event_name,{detail:pressedKey}));
 			return;
 		}
+	}
+
+	document.addEventListener("keydown", (e) => {
+		handleKeyboardEvent(e);
 	});
 	
 	return kb;

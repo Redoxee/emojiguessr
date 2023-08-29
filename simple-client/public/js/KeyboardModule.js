@@ -37,7 +37,7 @@ function create_keyboard_element(layout_name) {
             };
         });
     });
-    document.addEventListener("keyup", (e) => {
+    const handleKeyboardEvent = (e) => {
         if (e.isComposing || e.ctrlKey) {
             return;
         }
@@ -55,6 +55,9 @@ function create_keyboard_element(layout_name) {
             kb.dispatchEvent(new CustomEvent(input_event_name, { detail: pressedKey }));
             return;
         }
+    };
+    document.addEventListener("keydown", (e) => {
+        handleKeyboardEvent(e);
     });
     return kb;
 }
