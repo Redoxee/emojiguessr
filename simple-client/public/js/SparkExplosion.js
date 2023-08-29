@@ -1,5 +1,5 @@
 "use strict";
-function CreateExplosion(target, parameters) {
+function CreateSparkExplosion(target, parameters) {
     const root = document.createElement('div');
     root.className = 'explosion';
     const sparkContents = (parameters === null || parameters === void 0 ? void 0 : parameters.SparkContent) || ['🏅', '🏆', '🎉', '🔥'];

@@ -11,7 +11,6 @@ function create_guessing_field_element() {
     guessingField.letterPool = [];
     guessingField.wordContainers = [];
     guessingField.cursor = 0;
-    guessingField.value = "";
     guessingField.length = 0;
     const allowedChars = /[a-z]|[éè]/gi;
     const letterClassName = "guessing-letter letter";
@@ -29,10 +28,9 @@ function create_guessing_field_element() {
         wordContainer.className = "guessing-word";
         guessingField.wordContainers.push(wordContainer);
     }
-    guessingField.configure = function (pattern, forceDisplay) {
+    guessingField.Configure = function (pattern, forceDisplay) {
         this.replaceChildren();
         this.cursor = 0;
-        this.value = "";
         this.length = pattern.length;
         this.pattern = pattern;
         let wordCount = 0;
@@ -57,6 +55,7 @@ function create_guessing_field_element() {
                 letter.charType = CharType.Filler;
                 letter.className = fillerClassName;
                 this.appendChild(letter);
+                letter.content.textContent = char;
                 wordCount++;
                 currentWord = this.wordContainers[wordCount];
                 currentWord.replaceChildren();
@@ -71,22 +70,27 @@ function create_guessing_field_element() {
         }
         this.append(currentWord);
         while (this.cursor < this.letterPool.length && this.letterPool[this.cursor].charType !== CharType.Letter) {
-            this.value += " ";
             this.cursor++;
         }
     };
-    guessingField.input = function (input) {
+    guessingField.GetCurrentValue = function () {
+        let result = "";
+        for (let index = 0; index < this.cursor; ++index) {
+            result += this.letterPool[index].content.textContent;
+        }
+        return result;
+    };
+    guessingField.Input = function (input) {
         if (input === "enter") {
-            this.dispatchEvent(new CustomEvent("submit"));
+            let value = this.GetCurrentValue();
+            this.dispatchEvent(new CustomEvent("submit", { detail: { value } }));
             return;
         }
         else if (input === "backspace") {
             if (this.cursor > 0) {
-                this.value = this.value.substring(0, this.value.length - 1);
                 this.cursor--;
                 let letter = this.letterPool[this.cursor];
                 while (letter.charType !== CharType.Letter && this.cursor > 0) {
-                    this.value = this.value.substring(0, this.value.length - 1);
                     this.cursor--;
                     letter = this.letterPool[this.cursor];
                 }
@@ -110,14 +114,12 @@ function create_guessing_field_element() {
             return;
         }
         {
-            this.value += input;
             let letter = this.letterPool[this.cursor];
             letter.content.textContent = input;
             letter.className = letterFilledClassName;
             this.cursor++;
             letter = this.letterPool[this.cursor];
             while (this.cursor < this.letterPool.length && letter.charType !== CharType.Letter) {
-                this.value += " ";
                 this.cursor++;
                 letter = this.letterPool[this.cursor];
             }

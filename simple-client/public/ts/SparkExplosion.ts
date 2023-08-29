@@ -8,7 +8,7 @@ interface ExplosionParameters {
 	DelayVariance : number,
 }
 
-function CreateExplosion(target : HTMLElement, parameters : ExplosionParameters|null) : void {
+function CreateSparkExplosion(target : HTMLElement, parameters : ExplosionParameters|null) : void {
 	const root = document.createElement('div');
 	root.className = 'explosion';
 
