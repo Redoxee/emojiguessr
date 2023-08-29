@@ -119,7 +119,17 @@ app.put('/guess/:playerId/:answer', (req, res)=> {
     if(!roundResults[playerId]) {
         const serverAnswer = selectedContent[selectedAnswer];
         if (playerAnswer !== serverAnswer) {
-            res.status(200).send({result: false});
+            let correction = "";
+            for (let index = 0; index < serverAnswer.length; ++index) {
+                if (index >= playerAnswer.length || serverAnswer[index] !== playerAnswer[index]) {
+                    correction += "X";
+                }
+                else {
+                    correction += "O";
+                }
+            }
+
+            res.status(200).send({result: false, correction});
             return;
         }
 

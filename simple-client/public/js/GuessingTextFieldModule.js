@@ -13,10 +13,18 @@ function create_guessing_field_element() {
     guessingField.cursor = 0;
     guessingField.length = 0;
     const allowedChars = /[a-z]|[éè]/gi;
+    const fieldHorizontalShakeClassName = "horizontal-shake";
     const letterClassName = "guessing-letter letter";
     const letterFilledClassName = "guessing-letter letter filled";
     const fillerClassName = "guessing-letter filler";
     const fillerCharClassName = "guessing-letter filler-char";
+    const letterWrongAnswerClassName = "letter-wrong-answer";
+    const letterWrongAnswerAnimationClassName = "letter-wrong-answer-animation";
+    const shakeDuration = .5;
+    guessingField.addEventListener("animationend", () => {
+        guessingField.classList.remove(fieldHorizontalShakeClassName);
+    });
+    guessingField.style.animationDuration = `${shakeDuration}s`;
     for (let index = 0; index < 200; ++index) {
         const letter = document.createElement("div");
         const letterContent = document.createElement("div");
@@ -27,6 +35,13 @@ function create_guessing_field_element() {
         const wordContainer = document.createElement("div");
         wordContainer.className = "guessing-word";
         guessingField.wordContainers.push(wordContainer);
+        letter.addEventListener("animationend", (ev) => {
+            if (ev.animationName === letterWrongAnswerClassName) {
+                letter.classList.remove(letterWrongAnswerAnimationClassName);
+                letter.classList.add(letterWrongAnswerClassName);
+            }
+        });
+        letter.style.animationDelay = `${shakeDuration * .9 + index * 0.025}s`;
     }
     guessingField.Configure = function (pattern, forceDisplay) {
         this.replaceChildren();
@@ -88,6 +103,7 @@ function create_guessing_field_element() {
         }
         else if (input === "backspace") {
             if (this.cursor > 0) {
+                const lastCharIndex = this.cursor;
                 this.cursor--;
                 let letter = this.letterPool[this.cursor];
                 while (letter.charType !== CharType.Letter && this.cursor > 0) {
@@ -97,6 +113,9 @@ function create_guessing_field_element() {
                 if (letter.charType === CharType.Letter) {
                     letter.content.textContent = "_";
                     letter.className = letterClassName;
+                }
+                else {
+                    this.cursor = lastCharIndex;
                 }
             }
             return;
@@ -122,6 +141,14 @@ function create_guessing_field_element() {
             while (this.cursor < this.letterPool.length && letter.charType !== CharType.Letter) {
                 this.cursor++;
                 letter = this.letterPool[this.cursor];
+            }
+        }
+    };
+    guessingField.FeedbackWrongAnswer = function (pattern) {
+        guessingField.classList.add(fieldHorizontalShakeClassName);
+        for (let index = 0; index < this.cursor; ++index) {
+            if (index >= pattern.length || pattern[index] === 'X') {
+                this.letterPool[index].classList.add(letterWrongAnswerAnimationClassName);
             }
         }
     };

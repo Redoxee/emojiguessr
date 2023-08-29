@@ -21,11 +21,11 @@
 .guessing-letter {
 	width: 0.75em;
 	height: 1em;
+	background-color: white;
 }
 
 .letter {
 	border: 0px;
-	background-color: white;
 	border-radius: 5px;
 	text-align: center;
 	padding: 0.5em;
@@ -40,7 +40,6 @@
 
 .filler-char {
 	border: 0px;
-	background-color: white;
 	border-radius: 5px;
 	text-align: center;
 	padding: 0.5em;
@@ -61,5 +60,59 @@
 	to {
 		top:0em;
 		opacity: 1;
+	}
+}
+
+.letter-wrong-answer {
+	background-color: #FFAAAA;
+}
+
+.letter-wrong-answer-animation {
+	/* @keyframes duration | easing-function | delay |iteration-count | direction | fill-mode | play-state | name */
+	animation: letter-wrong-answer;
+	animation-timing-function: ease-out;
+	animation-fill-mode: forwards;
+	animation-duration: 1s;
+}
+
+@keyframes letter-wrong-answer {
+	from {
+		background-color: red;
+	}
+
+	to {
+		background-color: #FFAAAA;
+	}
+}
+
+.horizontal-shake {
+	animation-name: wrong-horizontal-shake;
+	animation-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1);
+	animation-fill-mode: forwards;
+}
+
+@keyframes wrong-horizontal-shake {
+	0% {
+		transform: translateX(1em);
+	}
+
+	20% {
+		transform: translateX(-.8em);
+	}
+
+	40% {
+		transform: translateX(.6em);
+	}
+
+	60% {
+		transform: translateX(-.4em);
+	}
+
+	80% {
+		transform: translateX(.2em);
+	}
+
+	100% {
+		transform: translateX(0em);
 	}
 }

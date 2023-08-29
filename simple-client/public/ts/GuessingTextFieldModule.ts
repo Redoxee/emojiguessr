@@ -15,7 +15,8 @@ interface GuessingField extends HTMLDivElement {
 	cursor : number;
 	length : number;
 	pattern : String;
-	Configure(pattern : string, forceDisplay: boolean):void;
+	Configure(pattern : string, forceDisplay: boolean) : void;
+	FeedbackWrongAnswer(pattern : string) : void;
 	Input(ch : string) : void;
 	GetCurrentValue() : string;
 }
@@ -29,10 +30,22 @@ function create_guessing_field_element() : GuessingField {
 	guessingField.length = 0; 
 	
 	const allowedChars = /[a-z]|[éè]/gi;
+
+	const fieldHorizontalShakeClassName = "horizontal-shake";
 	const letterClassName = "guessing-letter letter";
 	const letterFilledClassName = "guessing-letter letter filled";
 	const fillerClassName = "guessing-letter filler";
 	const fillerCharClassName = "guessing-letter filler-char";
+	const letterWrongAnswerClassName = "letter-wrong-answer";
+	const letterWrongAnswerAnimationClassName = "letter-wrong-answer-animation";
+
+	const shakeDuration = .5;
+	
+	guessingField.addEventListener("animationend",()=>{
+		guessingField.classList.remove(fieldHorizontalShakeClassName);
+	});
+
+	guessingField.style.animationDuration = `${shakeDuration}s`;
 
 	for (let index = 0; index < 200; ++index) {
 		const letter = document.createElement("div") as LetterHolder;
@@ -46,6 +59,16 @@ function create_guessing_field_element() : GuessingField {
 		const wordContainer = document.createElement("div");
 		wordContainer.className = "guessing-word";
 		guessingField.wordContainers.push(wordContainer);
+
+		letter.addEventListener("animationend",(ev)=>{
+			if (ev.animationName === letterWrongAnswerClassName)
+			{
+				letter.classList.remove(letterWrongAnswerAnimationClassName);
+				letter.classList.add(letterWrongAnswerClassName);
+			}
+		});
+
+		letter.style.animationDelay = `${shakeDuration * .9 + index * 0.025}s`
 	}
 
 	guessingField.Configure = function (pattern: string, forceDisplay: boolean):void {
@@ -117,6 +140,7 @@ function create_guessing_field_element() : GuessingField {
 		} else if (input === "backspace") {
 			if (this.cursor > 0)
 			{
+				const lastCharIndex = this.cursor;
 				this.cursor--;
 				let letter = this.letterPool[this.cursor];
 				while( letter.charType !== CharType.Letter && this.cursor > 0){
@@ -127,6 +151,8 @@ function create_guessing_field_element() : GuessingField {
 				if (letter.charType === CharType.Letter) {
 					letter.content.textContent = "_";
 					letter.className = letterClassName;
+				} else {
+					this.cursor = lastCharIndex;
 				}
 			}
 
@@ -156,6 +182,15 @@ function create_guessing_field_element() : GuessingField {
 			while(this.cursor < this.letterPool.length && letter.charType !== CharType.Letter) {
 				this.cursor++;
 				letter = this.letterPool[this.cursor];
+			}
+		}
+	}
+
+	guessingField.FeedbackWrongAnswer = function(pattern : string) : void {
+		guessingField.classList.add(fieldHorizontalShakeClassName);
+		for (let index = 0; index < this.cursor; ++index) {
+			if (index >= pattern.length || pattern[index] === 'X') {
+				this.letterPool[index].classList.add(letterWrongAnswerAnimationClassName);
 			}
 		}
 	}

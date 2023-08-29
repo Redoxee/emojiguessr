@@ -141,6 +141,12 @@
                     index * 500);
                 }
             }
+            else {
+                console.log(res.data);
+                if (res.data.correction) {
+                    guessingField.FeedbackWrongAnswer(res.data.correction);
+                }
+            }
 		});
 
         async function refresh() {
