@@ -35,6 +35,13 @@
             <button id="reset">R</button>
             <button id='pause'>P</button>
         </div>
+
+        <div id="celebration-parent">
+            <div id="celebration-1"></div>
+            <div id="celebration-2"></div>
+            <div id="celebration-3"></div>
+        </div>
+
     </body>
 
     <script type="text/javascript">
@@ -54,6 +61,8 @@
         let inputHolder = document.getElementById('inputHolder');
         let nextRoundButton = document.getElementById('nextRoundButton');
         let resetButton = document.getElementById("reset");
+        let celebrationNode = document.getElementById('celebration-parent');
+        
         let lastFrame = -1;
 
         let playerId = 0;
@@ -103,13 +112,15 @@
         inputHolder.replaceChildren(keyboardModule);
 		keyboardModule.addEventListener("OnCustomKeyBoardInput", e => {
             if (playerId !== chefId) {
-                guessingField.input(e.detail);
+                guessingField.Input(e.detail);
             }
 		});
 
-		guessingField.addEventListener("submit", _=>{
-            const guess = guessingField.value.trim();
+		guessingField.addEventListener("submit", async (event)=>{
+            const guess = event.detail.value;
             console.log(`sending ${guess} ${guess.length}, ${guessingField.pattern.length}`);
+            console.log(`"${guess}"`);
+            console.log(`"${guessingField.pattern}"`);
             if(guess.length === 0) {
                 return;
             }
@@ -118,7 +129,18 @@
                 return;
             }
 
-            axiosGame.put(`/guess/${playerId}/${guess}`);
+            let res = await axiosGame.put(`/guess/${playerId}/${guess}`);
+            if (res.data.result) {
+                console.log("Correct answer !");
+                const nodes = celebrationNode.children;
+                for(let index = 0; index < nodes.length; ++index)
+                {
+                    setTimeout(()=>{
+                        CreateSparkExplosion(nodes[index], {Duration: 2.5});
+                    },
+                    index * 500);
+                }
+            }
 		});
 
         async function refresh() {
@@ -133,13 +155,13 @@
                     if (res.data.question) {
                         question = res.data.question;
                         if (guessingField.pattern !== res.data.question) {
-                            guessingField.configure(res.data.question, true);
+                            guessingField.Configure(res.data.question, true);
                         }
                     }
                     else
                     {
                         if (guessingField.pattern !== res.data.hintifiedAnswer) {
-                            guessingField.configure(res.data.hintifiedAnswer);
+                            guessingField.Configure(res.data.hintifiedAnswer);
                         }
                     }
                     
