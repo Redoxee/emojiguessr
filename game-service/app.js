@@ -96,8 +96,40 @@ app.put('/hint/:hint',(req, res)=>{
     res.status(200);
 });
 
-app.put('/guess/:playerId/:answer', (req, res)=>{
+app.put('/guess/:playerId/:answer', (req, res)=> {
     frame++;
+    const {answer: playerAnswer, playerId} = req.params;
+    console.log(`"${playerId}" - "${playerAnswer}"`);
+    
+    if(!playerId) {
+        res.status(400).send({reason:"Missing playerId"});
+        return;
+    }
+
+    if(!playerAnswer) {
+        res.status(400).send({reason:"Missing answer"});
+        return;
+    }
+
+    if(playerAnswer.length > 1000 || playerId.length > 1000) {
+        res.status(400).send({reason: "Payload too big"});
+        return;
+    }
+
+    if(!roundResults[playerId]) {
+        const serverAnswer = selectedContent[selectedAnswer];
+        if (playerAnswer !== serverAnswer) {
+            res.status(200).send({result: false});
+            return;
+        }
+
+        console.log(`Player ${playerId} found the correct response ${serverAnswer}`);
+        let score = Math.max(0, 8 - hints.length + 15 - Object.keys(roundResults).length);
+        roundResults[playerId] = score;
+
+        res.status(200).send({result: true});
+    }
+
     res.status(200);
 });
 
@@ -107,7 +139,7 @@ app.put('/response/:playerId/:responseIndex', (req, res)=>{
     frame++;
     if(!roundResults[playerId])
     {
-        if(responseIndex == selectedAnswer) {
+        if(responseIndex === selectedAnswer) {
             console.log(`Player ${playerId} found the correct response ${responseIndex} ${selectedContent[responseIndex]}`);
             
             let score = Math.max(0, 8 - hints.length + 15 - Object.keys(roundResults).length);
