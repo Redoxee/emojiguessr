@@ -25,7 +25,9 @@
                 <p>Select a name</p>
             </div>
             <div id="hintHolder"></div>
-            <div id='questionLabel'></div>
+            <div id="questionLabel"></div>
+            <div id="journalHolder"></div>
+            <div id="scoresHolder"></div>
             <emoji-picker></emoji-picker>
             <div id="inputHolder"></div>
         </div>
@@ -53,16 +55,17 @@
         
         const nameBuilderElement = document.getElementById('NameBuilder');
 
-        let playerLabel = document.getElementById('playerLabel');
-        let chefLabel = document.getElementById('chefLabel');
-        let questionLabel = document.getElementById('questionLabel');
-        let emojiPicker = document.querySelector('emoji-picker'); 
-        let hintHolder = document.getElementById('hintHolder');
-        let inputHolder = document.getElementById('inputHolder');
-        let nextRoundButton = document.getElementById('nextRoundButton');
-        let resetButton = document.getElementById("reset");
-        let celebrationNode = document.getElementById('celebration-parent');
-        
+        const playerLabel = document.getElementById('playerLabel');
+        const chefLabel = document.getElementById('chefLabel');
+        const questionLabel = document.getElementById('questionLabel');
+        const emojiPicker = document.querySelector('emoji-picker'); 
+        const hintHolder = document.getElementById('hintHolder');
+        const inputHolder = document.getElementById('inputHolder');
+        const nextRoundButton = document.getElementById('nextRoundButton');
+        const resetButton = document.getElementById("reset");
+        const celebrationNode = document.getElementById('celebration-parent');
+        const journalNode = document.getElementById('journalHolder');
+        const scoresNode = document.getElementById('scoresHolder');
         let lastFrame = -1;
 
         let playerId = 0;
@@ -230,14 +233,32 @@
                             }
                         }
                     }
+                    
+                    {
+                        journalNode.replaceChildren();
+                        const serverJournal = res.data.journal;
+                        for(let entryIndex = 0; entryIndex < serverJournal.length; ++entryIndex)
+                        {
+                            const entry = serverJournal[entryIndex];
+                            journalNode.appendChild(TranslateJournalEntry(entry));
+                        }
+                    }
+
+                    {
+                        scoresNode.replaceChildren();
+                        const scores = res.data.scores;
+                        for (const entryId in scores) {
+                            const score = scores[entryId];
+                            scoresNode.appendChild(TranslateScores(entryId, score));
+                        }
+                    }
                 }
             }
-
-//            setTimeout(refresh, refreshRate);
         }
+
         setInterval(refresh, refreshRate)
         resetButton.addEventListener('click',(event)=> {
-            axiosGame.put('/reset');
+            axiosGame.put(`/reset/${playerId}`);
         });
         
         let pauseButton = document.getElementById('pause');
@@ -246,12 +267,26 @@
         });
 
         emojiPicker.addEventListener('emoji-click', (event)=>{
-            axiosGame.put(`/hint/${event.detail.unicode}`);
+            axiosGame.put(`/hint/${playerId}/${event.detail.unicode}`);
         });
        
         nextRoundButton.addEventListener('click', (event)=> {
-            axiosGame.put('/nextRound'); 
+            axiosGame.put(`/nextRound/${playerId}`); 
         });
 
+        function TranslateJournalEntry(entry) {
+            const entryNode = document.createElement('div');
+            entryNode.className = 'journalEntry';
+            entryNode.textContent = `${entry.entryType} - ${GetNameFromId(entry.playerId)}`;
+            return entryNode;
+        }
+
+        function TranslateScores(entryId, score) {
+            const entryNode = document.createElement('div');
+            entryNode.className = 'scoreEntry';
+            const playerName = entryId === playerId.toString() ? 'You' : GetNameFromId(entryId);
+            entryNode.textContent = `${playerName} have ${score}🏅`;
+            return entryNode;
+        }
     </script>
 </html>
