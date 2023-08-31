@@ -17,19 +17,25 @@
     <body>
         <div id="game">
             <div id="title">🌶EmojiGuessr🔥</div>
-            <div id="playerInfo">
+            <div id="upperRow">
                 <div id='playerLabel'></div>
                 <div id='chefLabel'></div>
             </div>
             <div id = "NameBuilder">
                 <p>Select a name</p>
             </div>
-            <div id="hintHolder"></div>
+            <div id="hintContainer">
+                <div id="hintHolder"></div>
+            </div>
             <div id="questionLabel"></div>
-            <div id="journalHolder"></div>
-            <div id="scoresHolder"></div>
-            <emoji-picker></emoji-picker>
-            <div id="inputHolder"></div>
+            <div id="lowerRow">
+                <div id="journalHolder"></div>
+                <div id="inputContainer">
+                    <emoji-picker></emoji-picker>
+                    <div id="inputHolder"></div>
+                </div>
+                <div id="scoresHolder"></div>
+            </div>
         </div>
         <button id="nextRoundButton">Next Round</button>
         <div id="credits">Made by AntonMakesGames with help from François Eoche</div>
@@ -82,6 +88,7 @@
         setVisibility(playerLabel, false);
         setVisibility(nextRoundButton, false);
         setVisibility(inputHolder, false);
+        setVisibility(questionLabel, false)
         
         {
             const pseudonymPicker = create_pseudonyme_picker();
@@ -207,6 +214,7 @@
                     
                     {
                         setVisibility(hintHolder, true);
+                        setVisibility(questionLabel, true);
 
                         const numberOfHintItem = hints.length + 1;
                         if (hintHolder.childNodes.length !== numberOfHintItem) {
@@ -277,6 +285,7 @@
         function TranslateJournalEntry(entry) {
             const entryNode = document.createElement('div');
             entryNode.className = 'journalEntry';
+            
             entryNode.textContent = `${entry.entryType} - ${GetNameFromId(entry.playerId)}`;
             return entryNode;
         }
