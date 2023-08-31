@@ -109,7 +109,7 @@ app.put('/chefId/:chefId', (req, res) => {
     frame++;
 	LogEntry(JournalEntryType.NewGM, currentChefId)
     console.log('currentChefId is ' + currentChefId);
-    res.status(200);
+    res.status(200).send();
 });
 
 app.put('/nextRound/:playerId',(req, res) => {
@@ -119,7 +119,7 @@ app.put('/nextRound/:playerId',(req, res) => {
 
 	LogEntry(JournalEntryType.NewRound, req.params.playerId);
     frame++;
-    res.status(200);
+    res.status(200).send();
 });
 
 app.put('/reset/:playerId', (req, res)=> {
@@ -133,10 +133,16 @@ app.put('/reset/:playerId', (req, res)=> {
 });
 
 app.put('/hint/:playerId/:hint',(req, res)=>{
+    const startedFrame = frame;
+    console.log(`Put hint frame ${startedFrame}`);
     hints.push(req.params.hint);
+    console.log(`Pushed hint frame ${startedFrame}`);
     LogEntry(JournalEntryType.GMSelectedHint, req.params.playerId);
+    console.log(`Logged frame ${startedFrame}`);
     frame++;
-    res.status(200);
+    res.status(200).send();
+    
+    console.log(`Ended hint frame ${startedFrame}`);
 });
 
 app.put('/guess/:playerId/:answer', (req, res)=> {
@@ -193,7 +199,7 @@ app.put('/guess/:playerId/:answer', (req, res)=> {
 		}
     }
 
-    res.status(200);
+    res.status(200).send();
 });
 
 app.get('/', (req, res) => {
@@ -203,8 +209,7 @@ app.get('/', (req, res) => {
     });
 });
 
-
 app.listen(port, () => {
-  console.log(`Listening on port ${port}`)
-  console.log(content);
+    console.log(content);
+    console.log(`Listening on port ${port}`)
 });
