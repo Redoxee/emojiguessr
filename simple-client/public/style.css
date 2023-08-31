@@ -50,8 +50,11 @@ body {
     justify-content: center;
     gap: .3em;
     flex-flow: row;
+	flex-wrap: wrap;
+    max-width: 100%;
     background-color: salmon;
     border-radius: .5em;
+    padding: .4em;
 }
 
 #questionLabel {
@@ -85,8 +88,10 @@ body {
 #hint{
     margin: 3px;
     display: inline-block;
+    position: relative;
     width: 5em;
     height: 5em;
+    animation: new-hint 0.5s ease-out 0s 1 normal forwards;
 }
 
 #hint > * {
@@ -177,4 +182,16 @@ button:active {
 #celebration-3 {
     top: 25%;
     left: 75%;
+}
+
+@keyframes new-hint {
+    from {
+        opacity: 0%;
+        top: -.4em;
+    }
+
+    to {
+        opacity: 100%;
+        top: 0em;
+    }
 }

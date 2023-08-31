@@ -218,6 +218,7 @@
 
                         const numberOfHintItem = hints.length + 1;
                         if (hintHolder.childNodes.length !== numberOfHintItem) {
+                            // TODO : Reuse hint items to fix animations
                             let hintItems = [];
                             for (let i = 0; i < numberOfHintItem; ++i){
                                 const hint = document.createElement('div');
