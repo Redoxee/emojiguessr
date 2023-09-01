@@ -258,9 +258,8 @@
                     {
                         scoresNode.replaceChildren();
                         const scores = res.data.scores;
-                        for (const entryId in scores) {
-                            const score = scores[entryId];
-                            scoresNode.appendChild(TranslateScores(entryId, score));
+                        for (let index = 0; index < scores.length; ++index) {
+                            scoresNode.appendChild(TranslateScores(scores[index]));
                         }
                     }
                 }
@@ -293,11 +292,11 @@
             return entryNode;
         }
 
-        function TranslateScores(entryId, score) {
+        function TranslateScores(scoreEntry) {
             const entryNode = document.createElement('div');
             entryNode.className = 'scoreEntry';
-            const playerName = entryId === playerId.toString() ? 'You' : GetNameFromId(entryId);
-            entryNode.textContent = `${playerName} have ${score}🏅`;
+            const playerName = scoreEntry.id === playerId.toString() ? 'You' : GetNameFromId(scoreEntry.id);
+            entryNode.textContent = `${playerName} have ${scoreEntry.score}🏅`;
             return entryNode;
         }
     </script>

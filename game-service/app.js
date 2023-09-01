@@ -27,7 +27,7 @@ let hintifiedAnswer = "";
 let currentChefId = null;
 let hints = [];
 let roundResults = {};
-let scores = {};
+let scores = [];
 const maxJournalEntries = 10;
 let journal = [];
 var allowedChars = /[a-z]|[éè]/gi;
@@ -97,7 +97,7 @@ app.put('/reset/:playerId', (req, res) => {
     LogEntry(JournalEntryType.ResetGame, req.params.playerId);
     currentChefId = null;
     selectNew();
-    scores = {};
+    scores = [];
     frame++;
     console.log("Reset");
     res.send({ response: selectedContent[selectedAnswer] });
@@ -149,12 +149,15 @@ app.put('/guess/:playerId/:answer', (req, res) => {
             console.log(`Player ${playerId} found the correct response ${serverAnswer}`);
             let score = Math.max(0, 8 - hints.length + 15 - Object.keys(roundResults).length);
             roundResults[playerId] = score;
-            if (scores[playerId]) {
-                scores[playerId] += score;
+            let scoreEntry = scores.find(element => element.id === playerId);
+            if (!scoreEntry) {
+                scoreEntry = { id: playerId, score };
+                scores.push(scoreEntry);
             }
             else {
-                scores[playerId] = score;
+                scoreEntry.score += score;
             }
+            scores.sort((a, b) => b.score - a.score);
             LogEntry(JournalEntryType.CorrectAnswer, playerId);
             res.status(200).send({ result: true });
         }
