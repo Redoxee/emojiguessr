@@ -54,7 +54,7 @@ body {
     max-width: 100%;
     background-color: salmon;
     border-radius: .5em;
-    padding: .4em;
+    padding: .2em 5em .6em .4em;
 }
 
 #questionLabel {
