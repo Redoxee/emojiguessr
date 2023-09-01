@@ -2,21 +2,32 @@
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	gap:0.3em;
+	gap:0.5em;
+	max-width: 100%;
 }
 
-.pseudo-picker-row {
+.pseudo-picker-content {
 	display: flex;
 	flex-direction: row;
+	gap: 3em;
+	
+}
+
+.pseudo-picker-group {
+	display: flex;
+	flex-direction: column;
     place-content: center;
     place-items: center;
 	width: 100%;
-	gap:0.5em;
+	gap: .15em;
 }
 
 .pseudo-picker-button {
 	background-color: blueviolet;
 	width: 16em;
+	height: auto;
+	padding: 0em;
+	border-radius: .5em;
 }
 
 .pseudo-picker-button.selected {

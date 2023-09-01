@@ -9,14 +9,29 @@ interface PseudoPickerPropositionButton  extends HTMLButtonElement {
 }
 
 function create_pseudonyme_picker() : PseudoPicker {
+	
+	
 	const selectionEventName = 'OnPseudoPicked';
 	const numberOfProposition = 3;
 	const pseudoPicker = document.createElement('div') as PseudoPicker;
 	pseudoPicker.className = 'pseudo-picker';
-	const range = (start:number, stop:number) => Array.from({ length: (stop - start) + 1 }, (_, i) => start + i);
 
+	const introductionLabel = document.createElement('p');
+	introductionLabel.className = 'introduction-label';
+	introductionLabel.textContent = 'Who are you ?';
+	pseudoPicker.appendChild(introductionLabel);
+	
+	const range = (start:number, stop:number) => Array.from({ length: (stop - start) + 1 }, (_, i) => start + i);
+	
 	pseudoPicker.selectedOptions = Array(pseudonimous_data.length);
 	pseudoPicker.optionButtons = Array(pseudonimous_data.length);
+	
+	const namePresentation = document.createElement('div');
+	namePresentation.className = 'pseudo-picker-name-presentation';
+	const label = document.createElement('p');
+	label.textContent = 'I am the ';
+	namePresentation.appendChild(label);
+
 
 	const onOptionSelected = function(wordIndex: number, selectedIndex: number) : void {
 		pseudoPicker.selectedOptions[wordIndex] = selectedIndex;
@@ -40,11 +55,15 @@ function create_pseudonyme_picker() : PseudoPicker {
 		pseudoPicker.confirmationButton.style.display = '';
 	}
 
+	const nameOptionsNode = document.createElement('div');
+	nameOptionsNode.className = 'pseudo-picker-content';
+	pseudoPicker.appendChild(nameOptionsNode);
+
 	for (let wordIndex = 0; wordIndex < pseudonimous_data.length; ++wordIndex) {
-		const row = document.createElement('div');
+		const group = document.createElement('div');
 		
-		row.className = 'pseudo-picker-row';
-		pseudoPicker.appendChild(row);
+		group.className = 'pseudo-picker-group';
+		nameOptionsNode.appendChild(group);
 		let availableIndexes = range(0, pseudonimous_data[wordIndex].length);
 		
 		pseudoPicker.selectedOptions[wordIndex] = -1;
@@ -60,10 +79,11 @@ function create_pseudonyme_picker() : PseudoPicker {
 			propositionButton.propalIndex = propalIndex;
 			propositionButton.addEventListener('click', (_)=> {onOptionSelected(wordIndex, propalIndex)});
 
-			row.appendChild(propositionButton);
+			group.appendChild(propositionButton);
 			pseudoPicker.optionButtons[wordIndex][propositionIndex] = propositionButton;
 		}
 	}
+	pseudoPicker.appendChild(namePresentation);
 
 	const confirmationButton = document.createElement('button');
 	confirmationButton.textContent = "That's me!";

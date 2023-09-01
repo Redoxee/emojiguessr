@@ -4,9 +4,18 @@ function create_pseudonyme_picker() {
     const numberOfProposition = 3;
     const pseudoPicker = document.createElement('div');
     pseudoPicker.className = 'pseudo-picker';
+    const introductionLabel = document.createElement('p');
+    introductionLabel.className = 'introduction-label';
+    introductionLabel.textContent = 'Who are you ?';
+    pseudoPicker.appendChild(introductionLabel);
     const range = (start, stop) => Array.from({ length: (stop - start) + 1 }, (_, i) => start + i);
     pseudoPicker.selectedOptions = Array(pseudonimous_data.length);
     pseudoPicker.optionButtons = Array(pseudonimous_data.length);
+    const namePresentation = document.createElement('div');
+    namePresentation.className = 'pseudo-picker-name-presentation';
+    const label = document.createElement('p');
+    label.textContent = 'I am :';
+    namePresentation.appendChild(label);
     const onOptionSelected = function (wordIndex, selectedIndex) {
         pseudoPicker.selectedOptions[wordIndex] = selectedIndex;
         for (let jdx = 0; jdx < numberOfProposition; ++jdx) {
@@ -25,10 +34,13 @@ function create_pseudonyme_picker() {
         }
         pseudoPicker.confirmationButton.style.display = '';
     };
+    const nameOptionsNode = document.createElement('div');
+    nameOptionsNode.className = 'pseudo-picker-content';
+    pseudoPicker.appendChild(nameOptionsNode);
     for (let wordIndex = 0; wordIndex < pseudonimous_data.length; ++wordIndex) {
-        const row = document.createElement('div');
-        row.className = 'pseudo-picker-row';
-        pseudoPicker.appendChild(row);
+        const group = document.createElement('div');
+        group.className = 'pseudo-picker-group';
+        nameOptionsNode.appendChild(group);
         let availableIndexes = range(0, pseudonimous_data[wordIndex].length);
         pseudoPicker.selectedOptions[wordIndex] = -1;
         pseudoPicker.optionButtons[wordIndex] = Array(numberOfProposition);
@@ -41,10 +53,11 @@ function create_pseudonyme_picker() {
             propositionButton.textContent = pseudonimous_data[wordIndex][propalIndex];
             propositionButton.propalIndex = propalIndex;
             propositionButton.addEventListener('click', (_) => { onOptionSelected(wordIndex, propalIndex); });
-            row.appendChild(propositionButton);
+            group.appendChild(propositionButton);
             pseudoPicker.optionButtons[wordIndex][propositionIndex] = propositionButton;
         }
     }
+    pseudoPicker.appendChild(namePresentation);
     const confirmationButton = document.createElement('button');
     confirmationButton.textContent = "That's me!";
     confirmationButton.className = 'pseudo-picker-confirmation';
