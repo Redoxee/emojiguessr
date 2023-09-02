@@ -6,7 +6,7 @@ function create_pseudonyme_picker() {
     pseudoPicker.className = 'pseudo-picker';
     const introductionLabel = document.createElement('p');
     introductionLabel.className = 'introduction-label';
-    introductionLabel.textContent = 'Who are you ?';
+    introductionLabel.textContent = 'Select a name';
     pseudoPicker.appendChild(introductionLabel);
     const range = (start, stop) => Array.from({ length: (stop - start) + 1 }, (_, i) => start + i);
     pseudoPicker.selectedOptions = Array(pseudonimous_data.length);

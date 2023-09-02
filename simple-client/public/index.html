@@ -82,12 +82,17 @@
         let guessingField = create_guessing_field_element();
         let keyboardModule = create_keyboard_element("azerty");
 
-        setVisibility(emojiPicker, false);
-        setVisibility(playerLabel, false);
-        setVisibility(nextRoundButton, false);
-        setVisibility(inputHolder, false);
-        setVisibility(questionLabel, false);
-        setVisibility(hintHolder, false);
+
+        function hideEveryGameThings() {
+            setVisibility(emojiPicker, false);
+            setVisibility(playerLabel, false);
+            setVisibility(nextRoundButton, false);
+            setVisibility(inputHolder, false);
+            setVisibility(questionLabel, false);
+            setVisibility(hintHolder, false);
+        }
+
+        hideEveryGameThings();
         
         {
             const pseudonymPicker = create_pseudonyme_picker();
@@ -109,15 +114,24 @@
             const responses = res.data.responses;
         });
         
-        const becomeChefButton = document.createElement('Button');
-        becomeChefButton.id = "chefButton";
-        becomeChefButton.textContent = "I'm the game master"; 
-        becomeChefButton.addEventListener('click', (event)=>{
-            axiosGame.put(`/chefId/${playerId}`);
-        });
-        
+        const chefSelectionSection = document.createElement('div');
+        {
+            chefSelectionSection.id = "chefSelectionSection";
+
+            chefSelectionSection.appendChild(document.createTextNode('A player must choose to be the next chef'));
+
+            const becomeChefButton = document.createElement('Button');
+            becomeChefButton.id = "chefButton";
+            becomeChefButton.textContent = "I'm making the other guess"; 
+            becomeChefButton.addEventListener('click', (event)=>{
+                axiosGame.put(`/chefId/${playerId}`);
+            });
+
+            chefSelectionSection.appendChild(becomeChefButton);
+        }
+
         questionLabel.replaceChildren(guessingField);
-        
+
         inputHolder.replaceChildren(keyboardModule);
 		keyboardModule.addEventListener("OnCustomKeyBoardInput", e => {
             if (playerId !== chefId) {
@@ -180,85 +194,87 @@
                         }
                     }
                     
+                    setVisibility(playerLabel, chefId !== playerId);
                     if(srvChef !== chefId)
                     {
                         chefId = srvChef;
                         if(chefId) {
                             if(chefId === playerId) {
-                                chefLabel.replaceChildren(`you're ${GetNameFromId(playerId)}, the game master`);
+                                chefLabel.replaceChildren(`you're ${GetNameFromId(playerId)}, the game chef`);
                             } else 
                             {
-                                chefLabel.replaceChildren(`The game master is ${GetNameFromId(chefId)}`);
+                                chefLabel.replaceChildren(`The game chef is ${GetNameFromId(chefId)}`);
                             }
                         }
                         else {
-                            chefLabel.replaceChildren(becomeChefButton);
-                            setVisibility(emojiPicker, false);
+                            hideEveryGameThings();
+                            chefLabel.replaceChildren(chefSelectionSection);
                         }
                     }
                     
-                    setVisibility(playerLabel, chefId !== playerId);
+                    if (chefId) {
 
-                    hints = res.data.hints;
-                    
-                    if(chefId === playerId) {
-                        setVisibility(emojiPicker, true)
-                        setVisibility(nextRoundButton, true);
-                        setVisibility(inputHolder, false);
-                    }
-                    else {
-                        setVisibility(nextRoundButton, false);
-                        setVisibility(inputHolder, true);
-                    }
-                    
-                    {
-                        setVisibility(hintHolder, true);
-                        setVisibility(questionLabel, true);
-
-                        const numberOfHintItem = hints.length;
-                        if (hintHolder.childNodes.length > numberOfHintItem) {
-                            while(hintHolder.childNodes.length > numberOfHintItem) {
-                                hintHolder.removeChild(hintHolder.childNodes[hintHolder.childNodes.length - 1]);
+                        hints = res.data.hints;
+                        
+                        if(chefId === playerId) {
+                            setVisibility(emojiPicker, true)
+                            setVisibility(nextRoundButton, true);
+                            setVisibility(inputHolder, false);
+                        }
+                        else {
+                            setVisibility(nextRoundButton, false);
+                            setVisibility(inputHolder, true);
+                        }
+                        
+                        {
+                            setVisibility(hintHolder, true);
+                            setVisibility(questionLabel, true);
+                            
+                            const numberOfHintItem = hints.length;
+                            if (hintHolder.childNodes.length > numberOfHintItem) {
+                                while(hintHolder.childNodes.length > numberOfHintItem) {
+                                    hintHolder.removeChild(hintHolder.childNodes[hintHolder.childNodes.length - 1]);
+                                }
                             }
-                        }
-                        else if(hintHolder.childNodes.length < numberOfHintItem) {
-                            const numberToAdd = numberOfHintItem - hintHolder.childNodes.length;
-                            for (let index = 0; index < numberToAdd; ++index) {
-                                const hint = document.createElement('div');
-                                hint.id = "hint";
-                                hintHolder.appendChild(hint);
+                            else if(hintHolder.childNodes.length < numberOfHintItem) {
+                                const numberToAdd = numberOfHintItem - hintHolder.childNodes.length;
+                                for (let index = 0; index < numberToAdd; ++index) {
+                                    const hint = document.createElement('div');
+                                    hint.id = "hint";
+                                    hintHolder.appendChild(hint);
+                                }
+                            }
+                            
+                            for (let i = 0; i < numberOfHintItem; ++i) {
+                                const hintItem = hintHolder.childNodes[i];
+                                if (i < hints.length) {
+                                    let emo = document.createElement('p');
+                                    emo.textContent = hints[i];
+                                    
+                                    hintItem.replaceChildren(emo);
+                                }
+                                else {
+                                    hintItem.replaceChildren("");
+                                }
                             }
                         }
                         
-                        for (let i = 0; i < numberOfHintItem; ++i) {
-                            const hintItem = hintHolder.childNodes[i];
-                            if (i < hints.length) {
-                                let emo = document.createElement('p');
-                                emo.textContent = hints[i];
-                                
-                                hintItem.replaceChildren(emo);
-                            }
-                            else {
-                                hintItem.replaceChildren("");
-                            }
-                        }
-                    }
-                    
-                    {
-                        journalNode.replaceChildren();
-                        const serverJournal = res.data.journal;
-                        for(let entryIndex = 0; entryIndex < serverJournal.length; ++entryIndex)
                         {
-                            const entry = serverJournal[entryIndex];
-                            journalNode.appendChild(TranslateJournalEntry(entry));
+                            journalNode.replaceChildren();
+                            const serverJournal = res.data.journal;
+                            for(let entryIndex = 0; entryIndex < serverJournal.length; ++entryIndex)
+                            {
+                                const entry = serverJournal[entryIndex];
+                                journalNode.appendChild(TranslateJournalEntry(entry));
+                            }
                         }
-                    }
-
-                    {
-                        scoresNode.replaceChildren();
-                        const scores = res.data.scores;
-                        for (let index = 0; index < scores.length; ++index) {
-                            scoresNode.appendChild(TranslateScores(scores[index]));
+                        
+                        {
+                            scoresNode.replaceChildren();
+                            const scores = res.data.scores;
+                            for (let index = 0; index < scores.length; ++index) {
+                                scoresNode.appendChild(TranslateScores(scores[index]));
+                            }
                         }
                     }
                 }

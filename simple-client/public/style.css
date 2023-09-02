@@ -1,7 +1,20 @@
+:root {
+    --main-background : #00202e;
+    --plain-text : white;
+    --control-background : white;
+    --control-text : black;
+    --input-background : #8a508f;
+    --input-text : white;
+    --input-inverted-background:#2c4875;
+    --input-inverted:#ffe8be;
+    --prompt-background: #ff6361;
+}
+
 body {
-    background: #E26241;
+    background: var(--main-background);
     font-size: 20px;
     font-family: sans-serif, segoe ui emoji;
+    color: var(--plain-text)
 }
 
 #game {
@@ -15,6 +28,7 @@ body {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    word-wrap: break-word;
     width: 100%;
 }
 
@@ -26,14 +40,7 @@ body {
 }
 
 #playerLabel {
-    font-weight: bold;
-    font-size: 1.5em;
     text-align: left;
-}
-
-#chefLabel {
-    font-weight: bold;
-    font-size: 1.2em;
 }
 
 #nameBuilder {
@@ -46,13 +53,14 @@ body {
 }
 
 #hintHolder {
+    margin-top: 2em;
     display: flex;
     justify-content: center;
     gap: .3em;
     flex-flow: row;
 	flex-wrap: wrap;
     max-width: 100%;
-    background-color: salmon;
+    background-color: var(--prompt-background);
     border-radius: .5em;
     padding: .2em 5em .6em .4em;
 }
@@ -72,8 +80,15 @@ body {
     width: 100%;
 }
 
+button {
+    background-color: var(--input-background);
+    color: var(--input-text);
+    height: fit-content;
+}
+
 #journalHolder {
     justify-content: left;
+    font-size: small;
 }
 
 #inputContainer {
@@ -108,35 +123,31 @@ body {
     gap: .2em;
 }
 
-#chefButton {
-    font-size: 2em;
+#chefSelectionSection {
+    width: 100%;
+
+    display: flex;
+    flex-direction: row;
+    gap: 1em;
+    align-content: center;
+    align-items: center;
 }
 
 button {
-    appearance: none;
-    background: #940A37;
-    color: white;
-    border-radius: .8em;
-    border: solid 1px #FFD369;
-    box-shadow: 0 0 1px black;
-    padding: 0.8em 1em;
+    background: var(--control-background);
+    color: var(--control-text);
+    border-radius: .4em;
+    padding: 0.4em 1em;
     cursor: pointer;
     font-weight: bold;
 }
 
-button:hover, button:focus {
-    border-color: #5B0909;
-}
-
-button:active {
-    border-color: #5B0909;
-    background-color: #5B0909;
- }
 
 #hintPickerHolder {
     display: flex;
     gap: 1em;
 }
+
 #debug {
     width: 100%;
     display: flex;
@@ -144,6 +155,7 @@ button:active {
     justify-content: flex-end;
     gap: 1em;
 }
+
 #debug > * {
     font-size: 0.4em;
     padding: 0em;
@@ -153,7 +165,7 @@ button:active {
 #credits {
     margin-top: 3em;
     font-size: 0.5em;
-    color: white;
+    color: var(--plain-text);
 }
 
 #celebration-parent {

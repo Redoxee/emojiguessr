@@ -1,5 +1,7 @@
 
 .guessing-field {
+	--wrong-guess:#FFAAAA;
+
 	margin: 1rem .5rem;
 
 	display: flex;
@@ -8,6 +10,7 @@
 	align-content: center;
 	padding: .5em 1em;
 	background-color: lightgray;
+	color: black;
 	max-width: 100%;
 	row-gap: .5em;
 	border-radius: 5px;
@@ -66,7 +69,7 @@
 }
 
 .letter-wrong-answer {
-	background-color: #FFAAAA;
+	background-color: var(--wrong-guess);
 }
 
 .letter-wrong-answer-animation {
@@ -83,7 +86,7 @@
 	}
 
 	to {
-		background-color: #FFAAAA;
+		background-color: var(--wrong-guess);
 	}
 }
 

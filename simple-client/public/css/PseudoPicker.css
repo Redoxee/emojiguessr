@@ -23,14 +23,17 @@
 }
 
 .pseudo-picker-button.selected {
-	background-color: beige;
-	color: black;
+	background-color: var(--input-inverted-background);
+	color: var(--input-inverted);
 }
+
 .pseudo-picker-name-presentation {
 	display: flex;
 	flex-direction: row;
 	gap: 1em;
 	height: auto;
+	align-items: center;
+	margin-top: 1em;
 }
 
 .pseudo-picker-name-presentation-name {
@@ -42,7 +45,8 @@
 }
 
 .pseudo-picker-name-part {
-	background-color: lightgrey;
+	background-color: --input-background;
+	color: --input-text;
 	border-radius: .3em;
 	text-align: center;
 	min-width: 5em;
@@ -57,7 +61,6 @@
 
 
 .pseudo-picker-button {
-	background-color: blueviolet;
 	width: 16em;
 	height: auto;
 	padding: 0em;
