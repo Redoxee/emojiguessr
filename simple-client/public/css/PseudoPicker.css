@@ -22,6 +22,40 @@
 	gap: .15em;
 }
 
+.pseudo-picker-button.selected {
+	background-color: beige;
+	color: black;
+}
+.pseudo-picker-name-presentation {
+	display: flex;
+	flex-direction: row;
+	gap: 1em;
+	height: auto;
+}
+
+.pseudo-picker-name-presentation-name {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	height: auto;
+	gap: .4em;
+}
+
+.pseudo-picker-name-part {
+	background-color: lightgrey;
+	border-radius: .3em;
+	text-align: center;
+	min-width: 5em;
+	padding: .2em;
+	min-height: 1.2em;
+	position: relative;
+}
+
+.pseudo-picker-name-part > * {
+	position: relative;
+}
+
+
 .pseudo-picker-button {
 	background-color: blueviolet;
 	width: 16em;
@@ -30,7 +64,18 @@
 	border-radius: .5em;
 }
 
-.pseudo-picker-button.selected {
-	background-color: beige;
-	color: black;
+.pseudo-picker-part-selected {
+	animation: pseudo-picker-part-picked 0.5s ease-out 0s 1 normal forwards;
+}
+
+@keyframes pseudo-picker-part-picked {
+    from {
+        opacity: 0%;
+        top: -.4em;
+    }
+
+    to {
+        opacity: 100%;
+        top: 0em;
+    }
 }

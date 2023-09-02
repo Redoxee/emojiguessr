@@ -14,8 +14,23 @@ function create_pseudonyme_picker() {
     const namePresentation = document.createElement('div');
     namePresentation.className = 'pseudo-picker-name-presentation';
     const label = document.createElement('p');
-    label.textContent = 'I am :';
+    label.textContent = 'The ';
     namePresentation.appendChild(label);
+    const namePresentationName = document.createElement('div');
+    namePresentationName.className = 'pseudo-picker-name-presentation-name';
+    namePresentation.appendChild(namePresentationName);
+    const finalNameParts = Array(pseudonimous_data.length);
+    for (let index = 0; index < pseudonimous_data.length; ++index) {
+        const namePart = document.createElement('div');
+        namePart.className = 'pseudo-picker-name-part';
+        namePresentationName.appendChild(namePart);
+        const namePartInner = document.createElement('div');
+        namePart.appendChild(namePartInner);
+        finalNameParts[index] = namePartInner;
+        namePartInner.addEventListener('animationend', () => {
+            namePartInner.classList.remove('pseudo-picker-part-selected');
+        });
+    }
     const onOptionSelected = function (wordIndex, selectedIndex) {
         pseudoPicker.selectedOptions[wordIndex] = selectedIndex;
         for (let jdx = 0; jdx < numberOfProposition; ++jdx) {
@@ -26,6 +41,11 @@ function create_pseudonyme_picker() {
             else {
                 btn.className = 'pseudo-picker-button';
             }
+        }
+        const namePartNode = finalNameParts[wordIndex];
+        namePartNode.textContent = pseudonimous_data[wordIndex][selectedIndex];
+        if (!namePartNode.classList.contains('pseudo-picker-part-selected')) {
+            namePartNode.classList.add('pseudo-picker-part-selected');
         }
         for (let index = 0; index < pseudoPicker.selectedOptions.length; ++index) {
             if (pseudoPicker.selectedOptions[index] < 0) {
@@ -57,7 +77,6 @@ function create_pseudonyme_picker() {
             pseudoPicker.optionButtons[wordIndex][propositionIndex] = propositionButton;
         }
     }
-    pseudoPicker.appendChild(namePresentation);
     const confirmationButton = document.createElement('button');
     confirmationButton.textContent = "That's me!";
     confirmationButton.className = 'pseudo-picker-confirmation';
@@ -70,7 +89,8 @@ function create_pseudonyme_picker() {
             } }));
     });
     confirmationButton.style.display = 'none';
-    pseudoPicker.appendChild(confirmationButton);
+    namePresentation.appendChild(confirmationButton);
+    pseudoPicker.appendChild(namePresentation);
     pseudoPicker.confirmationButton = confirmationButton;
     return pseudoPicker;
 }

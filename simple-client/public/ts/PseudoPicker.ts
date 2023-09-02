@@ -18,7 +18,7 @@ function create_pseudonyme_picker() : PseudoPicker {
 
 	const introductionLabel = document.createElement('p');
 	introductionLabel.className = 'introduction-label';
-	introductionLabel.textContent = 'Who are you ?';
+	introductionLabel.textContent = 'Select a name';
 	pseudoPicker.appendChild(introductionLabel);
 	
 	const range = (start:number, stop:number) => Array.from({ length: (stop - start) + 1 }, (_, i) => start + i);
@@ -29,9 +29,24 @@ function create_pseudonyme_picker() : PseudoPicker {
 	const namePresentation = document.createElement('div');
 	namePresentation.className = 'pseudo-picker-name-presentation';
 	const label = document.createElement('p');
-	label.textContent = 'I am the ';
+	label.textContent = 'The ';
 	namePresentation.appendChild(label);
+	const namePresentationName = document.createElement('div');
+	namePresentationName.className = 'pseudo-picker-name-presentation-name';
+	namePresentation.appendChild(namePresentationName);
+	const finalNameParts : HTMLDivElement[] = Array(pseudonimous_data.length);
+	for(let index = 0; index < pseudonimous_data.length; ++index) {
+		const namePart = document.createElement('div');
+		namePart.className = 'pseudo-picker-name-part';
+		namePresentationName.appendChild(namePart);
+		const namePartInner = document.createElement('div');
+		namePart.appendChild(namePartInner);
+		finalNameParts[index] = namePartInner;
 
+		namePartInner.addEventListener('animationend',()=>{
+			namePartInner.classList.remove('pseudo-picker-part-selected');
+		});
+	}
 
 	const onOptionSelected = function(wordIndex: number, selectedIndex: number) : void {
 		pseudoPicker.selectedOptions[wordIndex] = selectedIndex;
@@ -45,6 +60,12 @@ function create_pseudonyme_picker() : PseudoPicker {
 			}
 		}
 
+		const namePartNode = finalNameParts[wordIndex];
+		namePartNode.textContent = pseudonimous_data[wordIndex][selectedIndex];
+		if (!namePartNode.classList.contains('pseudo-picker-part-selected')){
+			namePartNode.classList.add('pseudo-picker-part-selected');
+		}
+		
 		for (let index = 0; index < pseudoPicker.selectedOptions.length; ++index) {
 			if (pseudoPicker.selectedOptions[index] < 0)
 			{
@@ -83,8 +104,7 @@ function create_pseudonyme_picker() : PseudoPicker {
 			pseudoPicker.optionButtons[wordIndex][propositionIndex] = propositionButton;
 		}
 	}
-	pseudoPicker.appendChild(namePresentation);
-
+	
 	const confirmationButton = document.createElement('button');
 	confirmationButton.textContent = "That's me!";
 	confirmationButton.className = 'pseudo-picker-confirmation';
@@ -96,10 +116,11 @@ function create_pseudonyme_picker() : PseudoPicker {
 			id
 		}}));
 	});
-
+	
 	confirmationButton.style.display = 'none';
-
-	pseudoPicker.appendChild(confirmationButton);
+	namePresentation.appendChild(confirmationButton);
+	
+	pseudoPicker.appendChild(namePresentation);
 	pseudoPicker.confirmationButton = confirmationButton;
 
 	return pseudoPicker;
