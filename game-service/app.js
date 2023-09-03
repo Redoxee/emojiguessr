@@ -43,6 +43,41 @@ function hintify(source) {
     }
     return result;
 }
+function CorrectGuess(guess, correctGuess) {
+    let correction = "";
+    let availableCharacters = {};
+    for (let index = 0; index < correctGuess.length; ++index) {
+        const char = correctGuess[index];
+        if (availableCharacters[char]) {
+            availableCharacters[char]++;
+        }
+        else {
+            availableCharacters[char] = 1;
+        }
+    }
+    for (let index = 0; index < guess.length; ++index) {
+        if (index >= correctGuess.length) {
+            correction += "X";
+            continue;
+        }
+        const guessChar = guess[index];
+        if (guessChar === correctGuess[index]) {
+            correction += "O";
+        }
+        else {
+            if (availableCharacters[guessChar]) {
+                correction += "M";
+            }
+            else {
+                correction += "X";
+            }
+        }
+        if (availableCharacters[guessChar]) {
+            availableCharacters[guessChar]--;
+        }
+    }
+    return correction;
+}
 function selectNew() {
     selectedAnswer = Math.floor(Math.random() * selectedContent.length);
     hintifiedAnswer = hintify(selectedContent[selectedAnswer]);
@@ -130,23 +165,16 @@ app.put('/guess/:playerId/:answer', (req, res) => {
         return;
     }
     if (!roundResults[playerId]) {
-        const serverAnswer = selectedContent[selectedAnswer];
-        if (playerAnswer !== serverAnswer) {
-            let correction = "";
-            for (let index = 0; index < serverAnswer.length; ++index) {
-                if (index >= playerAnswer.length || serverAnswer[index] !== playerAnswer[index]) {
-                    correction += "X";
-                }
-                else {
-                    correction += "O";
-                }
-            }
+        const lowerServerAnswer = selectedContent[selectedAnswer].toLowerCase();
+        const lowerPlayerAnswer = playerAnswer.toLowerCase();
+        if (lowerPlayerAnswer !== lowerServerAnswer) {
+            let correction = CorrectGuess(lowerPlayerAnswer, lowerServerAnswer);
             LogEntry(JournalEntryType.WrongAnswer, playerId);
             res.status(200).send({ result: false, correction });
             return;
         }
         else {
-            console.log(`Player ${playerId} found the correct response ${serverAnswer}`);
+            console.log(`Player ${playerId} found the correct response ${lowerServerAnswer}`);
             let score = Math.max(0, 8 - hints.length + 15 - Object.keys(roundResults).length);
             roundResults[playerId] = score;
             let scoreEntry = scores.find(element => element.id === playerId);

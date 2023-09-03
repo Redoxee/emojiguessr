@@ -105,5 +105,25 @@
         "Alien",
         "The Big Lebowski",
         "La Ligne verte"
-    ]
+    ],
+    "question_characters": {
+        "name": "famous characters",
+        "guesses": [
+            "Mickey Mouse",
+            "Darth vader",
+            "Donald Duck",
+            "Gandalf",
+            "Frodo",
+            "Mc Donnald",
+            "E.T",
+            "Wizzard of Oz",
+            "Neo",
+            "Morpheus",
+            "Trinity",
+            "Mr Pink",
+            "The Pink Panther",
+            "Robbin Hood",
+            "Sauron"
+        ]
+    }
 }
