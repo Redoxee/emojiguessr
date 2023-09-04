@@ -19,17 +19,18 @@ var JournalEntryType;
     JournalEntryType[JournalEntryType["CorrectAnswer"] = 5] = "CorrectAnswer";
 })(JournalEntryType || (JournalEntryType = {}));
 const content = content_json_1.default;
-const selectedContentName = content.selected_content;
-let selectedContent = content[selectedContentName];
+const selectedContentName = "question_characters";
+let selectedContent = content[selectedContentName].guesses;
 let frame = 1;
 let selectedAnswer = 0;
 let hintifiedAnswer = "";
 let currentChefId = null;
 let hints = [];
 let roundResults = {};
-let scores = [];
 const maxJournalEntries = 10;
 let journal = [];
+const playerLifeTime = 5 * 1000;
+const knownPlayers = [];
 var allowedChars = /[a-z]|[éè]/gi;
 function hintify(source) {
     let result = "";
@@ -95,18 +96,33 @@ app.get('/chefId/', (req, res) => {
     res.send({ chefId: currentChefId });
 });
 app.get('/refresh/:playerId', (req, res) => {
+    const playerId = req.params.playerId;
+    console.log(`playerId ${playerId}, frame ${frame}`);
+    {
+        let playerEntry = knownPlayers.find((element) => {
+            return element.playerId === playerId;
+        });
+        if (!playerEntry) {
+            console.log(`new player ${playerId}`);
+            playerEntry = { playerId, lastSeen: Date.now(), score: 0 };
+            knownPlayers.push(playerEntry);
+            frame++;
+        }
+        else {
+            playerEntry.lastSeen = Date.now();
+        }
+    }
     let response = {
         chefId: currentChefId,
         hints: hints,
-        scores,
+        scores: knownPlayers,
         roundResults,
         hintifiedAnswer,
         frame,
         question: "",
-        journal
+        journal,
+        knownPlayers,
     };
-    const playerId = req.params.playerId;
-    console.log(`playerId ${playerId}, frame ${frame}`);
     if (currentChefId && currentChefId === playerId) {
         response.question = selectedContent[selectedAnswer];
     }
@@ -132,7 +148,7 @@ app.put('/reset/:playerId', (req, res) => {
     LogEntry(JournalEntryType.ResetGame, req.params.playerId);
     currentChefId = null;
     selectNew();
-    scores = [];
+    knownPlayers.splice(0, knownPlayers.length);
     frame++;
     console.log("Reset");
     res.send({ response: selectedContent[selectedAnswer] });
@@ -177,15 +193,11 @@ app.put('/guess/:playerId/:answer', (req, res) => {
             console.log(`Player ${playerId} found the correct response ${lowerServerAnswer}`);
             let score = Math.max(0, 8 - hints.length + 15 - Object.keys(roundResults).length);
             roundResults[playerId] = score;
-            let scoreEntry = scores.find(element => element.id === playerId);
-            if (!scoreEntry) {
-                scoreEntry = { id: playerId, score };
-                scores.push(scoreEntry);
-            }
-            else {
+            let scoreEntry = knownPlayers.find(element => element.playerId === playerId);
+            if (scoreEntry) {
                 scoreEntry.score += score;
             }
-            scores.sort((a, b) => b.score - a.score);
+            knownPlayers.sort((a, b) => b.score - a.score);
             LogEntry(JournalEntryType.CorrectAnswer, playerId);
             res.status(200).send({ result: true, correction });
         }
@@ -202,3 +214,16 @@ app.listen(port, () => {
     console.log(content);
     console.log(`Listening on port ${port}`);
 });
+setInterval(() => {
+    const now = Date.now();
+    let changed = false;
+    for (let index = knownPlayers.length - 1; index > -1; --index) {
+        if (now - knownPlayers[index].lastSeen > playerLifeTime) {
+            knownPlayers.splice(index, 1);
+            changed = true;
+        }
+    }
+    if (changed) {
+        frame++;
+    }
+}, 1000);

@@ -308,7 +308,7 @@
         function TranslateScores(scoreEntry) {
             const entryNode = document.createElement('div');
             entryNode.className = 'scoreEntry';
-            const playerName = scoreEntry.id === playerId.toString() ? 'You' : GetNameFromId(scoreEntry.id);
+            const playerName = scoreEntry.playerId === playerId.toString() ? 'You' : GetNameFromId(scoreEntry.playerId);
             entryNode.textContent = `${playerName} have ${scoreEntry.score}🏅`;
             return entryNode;
         }

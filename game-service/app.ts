@@ -13,7 +13,7 @@ interface CategoryEntry {
 }
 
 interface ContentStructure {
-	[name: string]: | string[] | string | CategoryEntry
+	[name: string]: CategoryEntry
 }
 
 interface RoundResults {
@@ -34,10 +34,16 @@ interface JournalEntry {
 	playerId : string,
 }
 
+interface PlayerKnownEntry {
+    playerId : string,
+    lastSeen : number,
+    score : number
+}
+
 const content = contentJson as ContentStructure;
 
-const selectedContentName = content.selected_content as string;
-let selectedContent = content[selectedContentName] as string[];
+const selectedContentName = "question_characters";
+let selectedContent = content[selectedContentName].guesses;
 
 let frame = 1;
 
@@ -47,10 +53,12 @@ let currentChefId : string|null = null;
 
 let hints :string[] = [];
 let roundResults : RoundResults = {};
-let scores : {id:string, score:number}[] = [];
 
 const maxJournalEntries = 10;
 let journal : JournalEntry[] = [];
+
+const playerLifeTime = 1 * 60 * 1000; // how long in miliseconds before forgeting a player.
+const knownPlayers : PlayerKnownEntry[] = [];
 
 var allowedChars = /[a-z]|[éè]/gi;
 
@@ -133,19 +141,37 @@ app.get('/chefId/', (req : Request, res : Response) => {
 });
 
 app.get('/refresh/:playerId', (req : Request, res : Response)=> {
+    const playerId = req.params.playerId;
+    console.log(`playerId ${playerId}, frame ${frame}`);
+
+    {
+        let playerEntry = knownPlayers.find((element)=> {
+            return element.playerId === playerId
+        });
+        
+        if (!playerEntry) {
+            console.log(`new player ${playerId}`);
+            playerEntry = {playerId, lastSeen : Date.now() , score: 0}
+            knownPlayers.push(playerEntry);
+            frame++;
+        }
+        else {
+            playerEntry.lastSeen = Date.now();
+        }
+    }
+
     let response = { 
         chefId: currentChefId,
         hints: hints,
-        scores,
+        scores: knownPlayers,
         roundResults,
         hintifiedAnswer,
         frame,
 		question : "",
-		journal
+		journal,
+        knownPlayers,
     };
 
-    const playerId = req.params.playerId;
-    console.log(`playerId ${playerId}, frame ${frame}`);
     if (currentChefId && currentChefId === playerId) {
         response.question = selectedContent[selectedAnswer];
     }
@@ -176,7 +202,7 @@ app.put('/reset/:playerId', (req, res)=> {
 	LogEntry(JournalEntryType.ResetGame, req.params.playerId);
     currentChefId = null;
     selectNew();
-    scores = [];
+    knownPlayers.splice(0, knownPlayers.length);
     frame++;
     console.log("Reset");
     res.send({response: selectedContent[selectedAnswer]});
@@ -230,17 +256,13 @@ app.put('/guess/:playerId/:answer', (req, res)=> {
 			console.log(`Player ${playerId} found the correct response ${lowerServerAnswer}`);
 			let score = Math.max(0, 8 - hints.length + 15 - Object.keys(roundResults).length);
 			roundResults[playerId] = score;
-            let scoreEntry = scores.find(element=>element.id === playerId);
-            if(!scoreEntry)
+            let scoreEntry = knownPlayers.find(element=>element.playerId === playerId);
+            if(scoreEntry)
             {
-                scoreEntry = {id:playerId, score};
-                scores.push(scoreEntry);
-            }
-            else {
                 scoreEntry.score += score;
             }
 
-            scores.sort((a, b)=> b.score - a.score);
+            knownPlayers.sort((a, b)=> b.score - a.score);
 			
 			LogEntry(JournalEntryType.CorrectAnswer, playerId);
 
@@ -262,3 +284,19 @@ app.listen(port, () => {
     console.log(content);
     console.log(`Listening on port ${port}`)
 });
+
+setInterval(() => {
+    const now = Date.now();
+    let changed = false;
+    for (let index = knownPlayers.length - 1; index > -1; --index) {
+        if(now - knownPlayers[index].lastSeen > playerLifeTime) {
+            knownPlayers.splice(index, 1);
+            changed = true;
+        }
+    }
+
+    if(changed)
+    {
+        frame++;
+    }
+}, 1000);
