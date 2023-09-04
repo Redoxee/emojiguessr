@@ -1,6 +1,11 @@
 
 .guessing-field {
-	--wrong-guess:#FFAAAA;
+	--correct-guess-intense: #19FF19;
+	--correct-guess: #FAFFFA;
+	--wrong-guess-intense:#FF0000;
+	--wrong-guess:#FFA0A0;
+	--move-guess-intense:#FFFF00;
+	--move-guess:#FFFFA0;
 
 	margin: 1rem .5rem;
 
@@ -82,11 +87,47 @@
 
 @keyframes letter-wrong-answer {
 	from {
-		background-color: red;
+		background-color: var(--wrong-guess-intense);
 	}
 
 	to {
 		background-color: var(--wrong-guess);
+	}
+}
+
+.letter-move-answer {
+	background-color: var(--move-guess);
+}
+
+.letter-move-answer-animation {
+	animation: letter-move-answer 1s ease-out 0s 1 normal forwards;
+}
+
+@keyframes letter-move-answer {
+	from {
+		background-color: var(--move-guess-intense);
+	}
+
+	to {
+		background-color: var(--move-guess);
+	}
+}
+
+.letter-correct-answer {
+	background-color: var(--correct-guess);
+}
+
+.letter-correct-answer-animation {
+	animation: letter-correct-answer 1s ease-out 0s 1 normal forwards;
+}
+
+@keyframes letter-correct-answer {
+	from {
+		background-color: var(--correct-guess-intense);
+	}
+
+	to {
+		background-color: var(--correct-guess);
 	}
 }
 

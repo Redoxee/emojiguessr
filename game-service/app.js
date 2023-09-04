@@ -167,8 +167,8 @@ app.put('/guess/:playerId/:answer', (req, res) => {
     if (!roundResults[playerId]) {
         const lowerServerAnswer = selectedContent[selectedAnswer].toLowerCase();
         const lowerPlayerAnswer = playerAnswer.toLowerCase();
+        let correction = CorrectGuess(lowerPlayerAnswer, lowerServerAnswer);
         if (lowerPlayerAnswer !== lowerServerAnswer) {
-            let correction = CorrectGuess(lowerPlayerAnswer, lowerServerAnswer);
             LogEntry(JournalEntryType.WrongAnswer, playerId);
             res.status(200).send({ result: false, correction });
             return;
@@ -187,7 +187,7 @@ app.put('/guess/:playerId/:answer', (req, res) => {
             }
             scores.sort((a, b) => b.score - a.score);
             LogEntry(JournalEntryType.CorrectAnswer, playerId);
-            res.status(200).send({ result: true });
+            res.status(200).send({ result: true, correction });
         }
     }
     res.status(200).send();

@@ -16,7 +16,7 @@ interface GuessingField extends HTMLDivElement {
 	length : number;
 	pattern : String;
 	Configure(pattern : string, forceDisplay: boolean) : void;
-	FeedbackWrongAnswer(pattern : string) : void;
+	FeedbackAnswer(pattern : string, isCorrect: boolean) : void;
 	Input(ch : string) : void;
 	GetCurrentValue() : string;
 }
@@ -36,8 +36,15 @@ function create_guessing_field_element() : GuessingField {
 	const letterFilledClassName = "guessing-letter letter filled";
 	const fillerClassName = "guessing-letter filler";
 	const fillerCharClassName = "guessing-letter filler-char";
+
+	const letterCorrectAnswerClassName = "letter-correct-answer";
+	const letterCorrectAnswerAnimationClassName = "letter-correct-answer-animation";
+
 	const letterWrongAnswerClassName = "letter-wrong-answer";
 	const letterWrongAnswerAnimationClassName = "letter-wrong-answer-animation";
+
+	const letterMoveAnswerClassName = "letter-move-answer";
+	const letterMoveAnswerAnimationClassName = "letter-move-answer-animation";
 
 	const shakeDuration = .5;
 	
@@ -65,6 +72,14 @@ function create_guessing_field_element() : GuessingField {
 			{
 				letter.classList.remove(letterWrongAnswerAnimationClassName);
 				letter.classList.add(letterWrongAnswerClassName);
+			}
+			else if (ev.animationName === letterMoveAnswerAnimationClassName) {
+				letter.classList.remove(letterMoveAnswerAnimationClassName);
+				letter.classList.add(letterMoveAnswerClassName);
+			} 
+			else if (ev.animationName === letterCorrectAnswerAnimationClassName) {
+				letter.classList.remove(letterCorrectAnswerAnimationClassName);
+				letter.classList.add(letterCorrectAnswerClassName);
 			}
 		});
 
@@ -186,11 +201,20 @@ function create_guessing_field_element() : GuessingField {
 		}
 	}
 
-	guessingField.FeedbackWrongAnswer = function(pattern : string) : void {
-		guessingField.classList.add(fieldHorizontalShakeClassName);
+	guessingField.FeedbackAnswer = function(pattern : string, isCorrect: boolean) : void {
+		if(!isCorrect) {
+			guessingField.classList.add(fieldHorizontalShakeClassName);
+		}
+		
 		for (let index = 0; index < this.cursor; ++index) {
 			if (index >= pattern.length || pattern[index] === 'X') {
 				this.letterPool[index].classList.add(letterWrongAnswerAnimationClassName);
+			} 
+			else if (pattern[index] === 'M') {
+				this.letterPool[index].classList.add(letterMoveAnswerAnimationClassName);
+			}
+			else {
+				this.letterPool[index].classList.add(letterCorrectAnswerAnimationClassName);
 			}
 		}
 	}

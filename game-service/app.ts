@@ -218,9 +218,9 @@ app.put('/guess/:playerId/:answer', (req, res)=> {
     if(!roundResults[playerId]) {
         const lowerServerAnswer = selectedContent[selectedAnswer].toLowerCase();
         const lowerPlayerAnswer = playerAnswer.toLowerCase();
-        if (lowerPlayerAnswer !== lowerServerAnswer) {
-            let correction = CorrectGuess(lowerPlayerAnswer, lowerServerAnswer);
+        let correction = CorrectGuess(lowerPlayerAnswer, lowerServerAnswer);
 
+        if (lowerPlayerAnswer !== lowerServerAnswer) {
 			LogEntry(JournalEntryType.WrongAnswer, playerId);
 
             res.status(200).send({result: false, correction});
@@ -244,7 +244,7 @@ app.put('/guess/:playerId/:answer', (req, res)=> {
 			
 			LogEntry(JournalEntryType.CorrectAnswer, playerId);
 
-			res.status(200).send({result: true});
+			res.status(200).send({result: true, correction});
 		}
     }
 
