@@ -29,7 +29,7 @@ let hints = [];
 let roundResults = {};
 const maxJournalEntries = 10;
 let journal = [];
-const playerLifeTime = 5 * 1000;
+const playerLifeTime = 1 * 60 * 1000; // how long in miliseconds before forgeting a player.
 const knownPlayers = [];
 var allowedChars = /[a-z]|[éè]/gi;
 function hintify(source) {
@@ -215,6 +215,9 @@ app.listen(port, () => {
     console.log(`Listening on port ${port}`);
 });
 setInterval(() => {
+    if (knownPlayers.length === 0) {
+        return;
+    }
     const now = Date.now();
     let changed = false;
     for (let index = knownPlayers.length - 1; index > -1; --index) {
@@ -225,5 +228,10 @@ setInterval(() => {
     }
     if (changed) {
         frame++;
+        if (knownPlayers.length === 0) {
+            console.log('Reseing game because of no more player');
+            currentChefId = null;
+            selectNew();
+        }
     }
 }, 1000);

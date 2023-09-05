@@ -286,6 +286,10 @@ app.listen(port, () => {
 });
 
 setInterval(() => {
+    if (knownPlayers.length === 0) {
+        return;
+    }
+
     const now = Date.now();
     let changed = false;
     for (let index = knownPlayers.length - 1; index > -1; --index) {
@@ -295,8 +299,13 @@ setInterval(() => {
         }
     }
 
-    if(changed)
-    {
+    if (changed) {
         frame++;
+
+        if(knownPlayers.length === 0) {
+            console.log('Reseing game because of no more player');
+            currentChefId = null;
+            selectNew();
+        }
     }
 }, 1000);
