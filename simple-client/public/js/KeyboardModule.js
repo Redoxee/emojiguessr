@@ -16,6 +16,8 @@ function create_keyboard_element(layout_name) {
     const input_event_name = "OnCustomKeyBoardInput";
     const kb = document.createElement("div");
     kb.className = "keyboard";
+    const keyPressedFeedbackClass = "keyboard-key-pressed-feedback";
+    const keys = {};
     layout.forEach(row => {
         const rowElement = document.createElement("div");
         rowElement.className = "keyboard-row";
@@ -25,16 +27,11 @@ function create_keyboard_element(layout_name) {
             btn.textContent = key;
             btn.className = "keyboard-key";
             rowElement.appendChild(btn);
+            const keyName = key === "⌫" ? "backspace" : key === "↵" ? "enter" : key;
             btn.onclick = _ => {
-                let value = key;
-                if (key === "⌫") {
-                    value = "backspace";
-                }
-                else if (key === "↵") {
-                    value = "enter";
-                }
-                kb.dispatchEvent(new CustomEvent(input_event_name, { detail: value }));
+                kb.dispatchEvent(new CustomEvent(input_event_name, { detail: keyName }));
             };
+            keys[keyName] = btn;
         });
     });
     const handleKeyboardEvent = (e) => {
@@ -42,6 +39,10 @@ function create_keyboard_element(layout_name) {
             return;
         }
         let pressedKey = String(e.key).toLowerCase();
+        const button = keys[pressedKey];
+        if (button && !button.classList.contains(keyPressedFeedbackClass)) {
+            keys[pressedKey].classList.add(keyPressedFeedbackClass);
+        }
         if (pressedKey === "backspace") {
             kb.dispatchEvent(new CustomEvent(input_event_name, { detail: pressedKey }));
             return;
@@ -58,6 +59,13 @@ function create_keyboard_element(layout_name) {
     };
     document.addEventListener("keydown", (e) => {
         handleKeyboardEvent(e);
+    });
+    document.addEventListener("keyup", (e) => {
+        let pressedKey = String(e.key).toLowerCase();
+        const button = keys[pressedKey];
+        if (button && button.classList.contains(keyPressedFeedbackClass)) {
+            button.classList.remove(keyPressedFeedbackClass);
+        }
     });
     return kb;
 }

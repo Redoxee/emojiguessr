@@ -4,6 +4,8 @@
 	flex-direction: column;
 	align-items: center;
 	gap: .5rem;
+
+	--pressed-feedback_color: darkslategray;
 }
 
 .keyboard-row {
@@ -19,4 +21,13 @@
 	margin: 0 2px;
 	cursor: pointer;
 	text-transform: uppercase;
+	transition: background-color 0.125s;
+}
+
+.keyboard-key:active {
+	background-color: var(--pressed-feedback_color);
+}
+
+.keyboard-key-pressed-feedback {
+	background-color: var(--pressed-feedback_color);
 }

@@ -5,6 +5,10 @@ interface LayoutCollection {
 	[name: string]: string[][]
 }
 
+interface KeyBtnCollection {
+	[name: string]: HTMLButtonElement
+}
+
 const layouts : LayoutCollection = {
 	azerty : [
 		["a","z","e","r","t","y","u","i","o","p","⌫"],
@@ -26,6 +30,9 @@ function create_keyboard_element(layout_name : string) : KeyboardElement {
 	const kb = <KeyboardElement>document.createElement("div");
 	kb.className = "keyboard";
 
+	const keyPressedFeedbackClass = "keyboard-key-pressed-feedback";
+	const keys : KeyBtnCollection = {};
+
 	layout.forEach(row => {
 		const rowElement = document.createElement("div");
 		rowElement.className="keyboard-row";
@@ -36,17 +43,13 @@ function create_keyboard_element(layout_name : string) : KeyboardElement {
 			btn.className = "keyboard-key";
 			rowElement.appendChild(btn);
 
-			btn.onclick=_=>{
-				let value = key;
-				if (key === "⌫") {
-					value = "backspace";
-				} else if (key === "↵") {
-					value = "enter";
-				}
+			const keyName = key === "⌫" ? "backspace" : key === "↵" ? "enter" : key;
 
-				kb.dispatchEvent(new CustomEvent(input_event_name,{detail:value}));
+			btn.onclick=_=>{
+				kb.dispatchEvent(new CustomEvent(input_event_name,{detail:keyName}));
 			};
 			
+			keys[keyName] = btn;
 		});
 	});
 
@@ -55,7 +58,13 @@ function create_keyboard_element(layout_name : string) : KeyboardElement {
 			return;
 		}
 
-		let pressedKey = String(e.key).toLowerCase()
+		let pressedKey = String(e.key).toLowerCase();
+
+		const button = keys[pressedKey];
+		if (button && !button.classList.contains(keyPressedFeedbackClass)) {
+			keys[pressedKey].classList.add(keyPressedFeedbackClass);
+		}
+
 		if (pressedKey === "backspace") {
 			kb.dispatchEvent(new CustomEvent(input_event_name,{detail:pressedKey}));
 			return;
@@ -75,6 +84,14 @@ function create_keyboard_element(layout_name : string) : KeyboardElement {
 
 	document.addEventListener("keydown", (e) => {
 		handleKeyboardEvent(e);
+	});
+
+	document.addEventListener("keyup", (e)=>{
+		let pressedKey = String(e.key).toLowerCase();
+		const button = keys[pressedKey];
+		if (button && button.classList.contains(keyPressedFeedbackClass)) {
+			button.classList.remove(keyPressedFeedbackClass);
+		}
 	});
 	
 	return kb;
