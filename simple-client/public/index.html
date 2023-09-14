@@ -1,3 +1,4 @@
+<!DOCTYPE html>
 <html>
     <link href="style.css" rel="stylesheet" type="text/css">
     <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
@@ -14,11 +15,14 @@
     <link rel="stylesheet" href="css/SparkExplosion.css">
     <link href="css/PseudoPicker.css" rel="stylesheet" type="text/css">
 
+    <head>
+        <meta charset="UTF-8">
+    </head>
+
     <body>
         <div id="game">
             <div id="title">🌶EmojiGuessr🔥</div>
             <div id="upperRow">
-                <div id='playerLabel'></div>
                 <div id='chefLabel'></div>
             </div>
             <div id = "NameBuilder"></div>
@@ -59,7 +63,6 @@
         
         const nameBuilderElement = document.getElementById('NameBuilder');
 
-        const playerLabel = document.getElementById('playerLabel');
         const chefLabel = document.getElementById('chefLabel');
         const questionLabel = document.getElementById('questionLabel');
         const emojiPicker = document.querySelector('emoji-picker'); 
@@ -85,11 +88,12 @@
 
         function hideEveryGameThings() {
             setVisibility(emojiPicker, false);
-            setVisibility(playerLabel, false);
             setVisibility(nextRoundButton, false);
             setVisibility(inputHolder, false);
             setVisibility(questionLabel, false);
             setVisibility(hintHolder, false);
+            setVisibility(journalNode, false);
+            setVisibility(scoresNode, false);
         }
 
         hideEveryGameThings();
@@ -101,8 +105,6 @@
                 console.log(event.detail);
                 playerId = event.detail.id;
                 
-                playerLabel.replaceChildren(`You're ${event.detail.name}`);
-                setVisibility(playerLabel, true);
                 setVisibility(nameBuilderElement, false);
             });
         }
@@ -192,17 +194,11 @@
                         }
                     }
                     
-                    setVisibility(playerLabel, chefId !== playerId);
                     if(srvChef !== chefId)
                     {
                         chefId = srvChef;
                         if(chefId) {
-                            if(chefId === playerId) {
-                                chefLabel.replaceChildren(`you're ${GetNameFromId(playerId)}, the game chef`);
-                            } else 
-                            {
-                                chefLabel.replaceChildren(`The game chef is ${GetNameFromId(chefId)}`);
-                            }
+                            chefLabel.replaceChildren();
                         }
                         else {
                             hideEveryGameThings();
@@ -225,7 +221,7 @@
                         }
                         
                         {
-                            setVisibility(hintHolder, true);
+                            setVisibility(hintHolder, hints.length > 0);
                             setVisibility(questionLabel, true);
                             
                             const numberOfHintItem = hints.length;
@@ -252,7 +248,7 @@
                                     hintItem.replaceChildren(emo);
                                 }
                                 else {
-                                    hintItem.replaceChildren("");
+                                    hintItem.replaceChildren();
                                 }
                             }
                         }
@@ -308,8 +304,15 @@
         function TranslateScores(scoreEntry) {
             const entryNode = document.createElement('div');
             entryNode.className = 'scoreEntry';
-            const playerName = scoreEntry.playerId === playerId.toString() ? 'You' : GetNameFromId(scoreEntry.playerId);
-            entryNode.textContent = `${playerName} have ${scoreEntry.score}🏅`;
+            let playerName = scoreEntry.playerId === playerId.toString() ? `${String.fromCodePoint(0x1FAF5)} ${GetNameFromId(scoreEntry.playerId)}` : GetNameFromId(scoreEntry.playerId);
+            if (scoreEntry.playerId === chefId.toString()) {
+                playerName = `${playerName} 🤠`;
+            }
+            else {
+                console.log(`${chefId} - ${scoreEntry.playerId}`);
+            }
+
+            entryNode.textContent = `${playerName} : ${scoreEntry.score}🏅`;
             return entryNode;
         }
     </script>
