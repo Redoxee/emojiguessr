@@ -148,6 +148,10 @@ button {
     gap: 1em;
 }
 
+emoji-picker {
+    --background : var(--prompt-background)
+}
+
 #debug {
     width: 100%;
     display: flex;
