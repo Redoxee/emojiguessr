@@ -5,7 +5,7 @@
 	align-items: center;
 	gap: .5rem;
 
-	--pressed-feedback_color: darkslategray;
+	--pressed-feedback_color: #AFAF91;
 }
 
 .keyboard-row {

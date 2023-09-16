@@ -24,6 +24,7 @@ enum JournalEntryType {
 	NewRound,
 	NewGM,
 	ResetGame,
+    DeleteHint,
 	GMSelectedHint,
 	WrongAnswer,
 	CorrectAnswer,
@@ -219,6 +220,27 @@ app.put('/hint/:playerId/:hint',(req, res)=>{
     res.status(200).send();
     
     console.log(`Ended hint frame ${startedFrame}`);
+});
+
+app.put('/delete/:playerId/:hintIndex', (req, res) =>{
+    if (req.params.playerId !== currentChefId) {
+        console.log(`wrong player expected ${currentChefId} got ${req.params.playerId}`);
+        res.status(400).send();
+        return;
+    }
+    
+    const hintIndex = Number(req.params.hintIndex);
+    if(hintIndex < 0 || hintIndex >= hints.length) {
+        console.log(`Wrong index ${hintIndex}`);
+        res.status(400).send();
+        return;
+    }
+
+    console.log(`index ${hintIndex}`);
+    hints.splice(hintIndex, 1);
+    LogEntry(JournalEntryType.DeleteHint, req.params.playerId);
+    frame++;
+    res.status(200).send();
 });
 
 app.put('/guess/:playerId/:answer', (req, res)=> {

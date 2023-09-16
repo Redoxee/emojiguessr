@@ -180,6 +180,30 @@
             }
 		});
 
+        const createHintPopOver = function() {
+            const popover = createElementWithId('div', 'popover');
+            const popoverBody = createElementWithId('button', 'popover-body');
+            const pointer = createElementWithId('div', 'popover-pointer');
+            const popoverContent = createElementWithId('div', 'popover-content');
+            popover.appendChild(popoverBody);
+            popover.appendChild(pointer);
+            popoverBody.appendChild(popoverContent);
+            popover.body = popoverBody;
+            
+            popover.className = "popover-hidden";
+            popover.OpenCloseInteraction = ()=>{
+                if(popover.classList.contains("popover-hidden") && playerId === chefId) {
+                    popover.classList.remove('popover-hidden');
+                    popover.classList.add('popover-show')
+                } else {
+                    popover.classList.remove('popover-show');
+                    popover.classList.add('popover-hidden');
+                }
+            }
+
+            return popover;
+        }
+
         async function refresh() {
             if(playerId && !pauseRefresh)
             {
@@ -238,11 +262,25 @@
                                     hintHolder.removeChild(hintHolder.childNodes[hintHolder.childNodes.length - 1]);
                                 }
                             }
+
                             else if(hintHolder.childNodes.length < numberOfHintItem) {
                                 const numberToAdd = numberOfHintItem - hintHolder.childNodes.length;
                                 for (let index = 0; index < numberToAdd; ++index) {
-                                    const hint = document.createElement('div');
-                                    hint.id = "hint";
+                                    const hint = createElementWithId('div', 'hint');
+                                    hint.content = createElementWithId('p', 'hint-content');
+                                    hint.appendChild(hint.content);
+                                    hint.popover = createHintPopOver();
+                                    hint.appendChild(hint.popover);
+                                    
+                                    hint.addEventListener('click', hint.popover.OpenCloseInteraction);
+
+                                    const hintIndex = hintHolder.childElementCount;
+                                    hint.popover.body.addEventListener('click',()=>{
+                                        if (playerId === chefId) {
+                                            axiosGame.put(`/delete/${playerId}/${hintIndex}`);
+                                        }
+                                    });
+
                                     hintHolder.appendChild(hint);
                                 }
                             }
@@ -250,13 +288,10 @@
                             for (let i = 0; i < numberOfHintItem; ++i) {
                                 const hintItem = hintHolder.childNodes[i];
                                 if (i < hints.length) {
-                                    let emo = document.createElement('p');
-                                    emo.textContent = hints[i];
-                                    
-                                    hintItem.replaceChildren(emo);
+                                    hintItem.content.textContent = hints[i];
                                 }
                                 else {
-                                    hintItem.replaceChildren();
+                                    hintItem.content.replaceChildren();
                                 }
                             }
                         }

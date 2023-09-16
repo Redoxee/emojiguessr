@@ -14,9 +14,10 @@ var JournalEntryType;
     JournalEntryType[JournalEntryType["NewRound"] = 0] = "NewRound";
     JournalEntryType[JournalEntryType["NewGM"] = 1] = "NewGM";
     JournalEntryType[JournalEntryType["ResetGame"] = 2] = "ResetGame";
-    JournalEntryType[JournalEntryType["GMSelectedHint"] = 3] = "GMSelectedHint";
-    JournalEntryType[JournalEntryType["WrongAnswer"] = 4] = "WrongAnswer";
-    JournalEntryType[JournalEntryType["CorrectAnswer"] = 5] = "CorrectAnswer";
+    JournalEntryType[JournalEntryType["DeleteHint"] = 3] = "DeleteHint";
+    JournalEntryType[JournalEntryType["GMSelectedHint"] = 4] = "GMSelectedHint";
+    JournalEntryType[JournalEntryType["WrongAnswer"] = 5] = "WrongAnswer";
+    JournalEntryType[JournalEntryType["CorrectAnswer"] = 6] = "CorrectAnswer";
 })(JournalEntryType || (JournalEntryType = {}));
 const content = content_json_1.default;
 const selectedContentName = "question_characters";
@@ -163,6 +164,24 @@ app.put('/hint/:playerId/:hint', (req, res) => {
     frame++;
     res.status(200).send();
     console.log(`Ended hint frame ${startedFrame}`);
+});
+app.put('/delete/:playerId/:hintIndex', (req, res) => {
+    if (req.params.playerId !== currentChefId) {
+        console.log(`wrong player expected ${currentChefId} got ${req.params.playerId}`);
+        res.status(400).send();
+        return;
+    }
+    const hintIndex = Number(req.params.hintIndex);
+    if (hintIndex < 0 || hintIndex >= hints.length) {
+        console.log(`Wrong index ${hintIndex}`);
+        res.status(400).send();
+        return;
+    }
+    console.log(`index ${hintIndex}`);
+    hints.splice(hintIndex, 1);
+    LogEntry(JournalEntryType.DeleteHint, req.params.playerId);
+    frame++;
+    res.status(200).send();
 });
 app.put('/guess/:playerId/:answer', (req, res) => {
     frame++;
