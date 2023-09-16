@@ -40,10 +40,13 @@
             </div>
         </div>
         <button id="nextRoundButton">Next Round</button>
-        <div id="credits">Made by AntonMakesGames with help from François Eoche</div>
-        <div id='debug'>
-            <button id="reset">R</button>
-            <button id='pause'>P</button>
+        <div id="footer">
+            <div id="credits">Made by AntonMakesGames with help from François Eoche</div>
+            <div id='debug'>
+                <button id="debug-button">Debug</button>
+                <button id="reset">Reset Game</button>
+                <button id='pause'>Pause</button>
+            </div>
         </div>
 
         <div id="celebration-parent">
@@ -85,6 +88,11 @@
         let guessingField = create_guessing_field_element();
         let keyboardModule = create_keyboard_element("azerty");
 
+        function createElementWithId(elementType, id) {
+            const element = document.createElement(elementType);
+            element.id = id;
+            return element;
+        }
 
         function hideEveryGameThings() {
             setVisibility(emojiPicker, false);

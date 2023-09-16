@@ -152,8 +152,24 @@ emoji-picker {
     --background : var(--prompt-background)
 }
 
-#debug {
+#footer {
+    position: absolute;
+    bottom: .5em;
     width: 100%;
+    margin: 0 1em .5em 1em;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+#credits {
+    font-size: 0.5em;
+    color: var(--plain-text);
+    overflow: visible;
+    white-space: nowrap;
+}
+
+#debug {
     display: flex;
     flex-flow: row;
     justify-content: flex-end;
@@ -164,12 +180,6 @@ emoji-picker {
     font-size: 0.4em;
     padding: 0em;
     border-radius: 0em;
-}
-
-#credits {
-    margin-top: 3em;
-    font-size: 0.5em;
-    color: var(--plain-text);
 }
 
 #celebration-parent {
