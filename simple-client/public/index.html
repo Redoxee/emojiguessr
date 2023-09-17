@@ -26,21 +26,23 @@
                 <div id='chefLabel'></div>
             </div>
             <div id="instruction"></div>
-            <div id="select-chef-section">
-                <button id="select-chef-button">I'm making the other guess</button>
-            </div>
             <div id = "NameBuilder"></div>
             <div id="hintContainer">
                 <div id="hintHolder"></div>
             </div>
             <div id="questionLabel"></div>
-            <div id="lowerRow">
+            <div id="information-row">
+                <div id="scoresHolder"></div>
                 <div id="journalHolder"></div>
+            </div>
+            <div id="lowerRow">
                 <div id="inputContainer">
                     <emoji-picker></emoji-picker>
-                    <div id="inputHolder"></div>
+                    <div id="keyboard-holder"></div>
+                    <div id="select-chef-section">
+                        <button id="select-chef-button">I'm making the other guess</button>
+                    </div>
                 </div>
-                <div id="scoresHolder"></div>
             </div>
         </div>
         <button id="nextRoundButton">Next Round</button>
@@ -75,7 +77,7 @@
         const questionLabel = document.getElementById('questionLabel');
         const emojiPicker = document.querySelector('emoji-picker'); 
         const hintHolder = document.getElementById('hintHolder');
-        const inputHolder = document.getElementById('inputHolder');
+        const inputHolder = document.getElementById('keyboard-holder');
         const nextRoundButton = document.getElementById('nextRoundButton');
         const resetButton = document.getElementById("reset");
         const celebrationNode = document.getElementById('celebration-parent');
@@ -234,7 +236,7 @@
                         }
                         else {
                             hideEveryGameThings();
-                            instruct('One player will make others guess');
+                            instruct('Are you the one that will make the other guess ?');
                             chefSelectionSection.style.display = '';
                         }
                     }
@@ -244,17 +246,24 @@
                         hints = res.data.hints;
                         
                         if(chefId === playerId) {
+                            instruct('Use emoji to communicate the answer to the other players (less emoji -> more points)');
                             setVisibility(emojiPicker, true)
                             setVisibility(nextRoundButton, true);
                             setVisibility(inputHolder, false);
                         }
                         else {
+                            if(hints.length < 1) {
+                                instruct('The chef is choosing emoji to clue you in on  the answer');
+                            } else {
+                                instruct("Guess what's the chef is trying to communicate");
+                            }
+
                             setVisibility(nextRoundButton, false);
                             setVisibility(inputHolder, true);
                         }
                         
                         {
-                            setVisibility(hintHolder, hints.length > 0);
+                            setVisibility(hintHolder, true);
                             setVisibility(questionLabel, true);
                             
                             const numberOfHintItem = hints.length;
