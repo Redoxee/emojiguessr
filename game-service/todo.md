@@ -1,4 +1,3 @@
-- Standardiser les emojis
 - Boutton pour demander un emojis?
 - Feedback correct guess pour le chef
-- Boutton pour supprimer un hint
+- Addapter le css pour mobile

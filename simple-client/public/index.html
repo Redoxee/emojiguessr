@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html>
-    <link href="style.css" rel="stylesheet" type="text/css">
     <script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
     <script src="https://unpkg.com/axios@1.1.2/dist/axios.min.js"></script>
     <!-- <script src="bxios.js"></script> -->
@@ -14,6 +13,7 @@
     <script src="js/SparkExplosion.js"></script>
     <link rel="stylesheet" href="css/SparkExplosion.css">
     <link href="css/PseudoPicker.css" rel="stylesheet" type="text/css">
+    <link href="style.css" rel="stylesheet" type="text/css">
 
     <head>
         <meta charset="UTF-8">
@@ -21,9 +21,13 @@
 
     <body>
         <div id="game">
-            <div id="title">🌶EmojiGuessr🔥</div>
+            <div id="title">🌶 EmojiGuessr 🔥</div>
             <div id="upperRow">
                 <div id='chefLabel'></div>
+            </div>
+            <div id="instruction"></div>
+            <div id="select-chef-section">
+                <button id="select-chef-button">I'm making the other guess</button>
             </div>
             <div id = "NameBuilder"></div>
             <div id="hintContainer">
@@ -59,13 +63,14 @@
 
     <script type="text/javascript">
         // const gameSrvUrl = "https://antonmakesgames.alwaysdata.net/";
-        const gameSrvUrl = "http://localhost:8100";
+        const gameSrvUrl = "http://192.168.1.58:8100";
         const axiosGame = axios.create({
             baseURL: gameSrvUrl,
         });
         
         const nameBuilderElement = document.getElementById('NameBuilder');
 
+        const instructionHolder = document.getElementById('instruction');
         const chefLabel = document.getElementById('chefLabel');
         const questionLabel = document.getElementById('questionLabel');
         const emojiPicker = document.querySelector('emoji-picker'); 
@@ -76,6 +81,8 @@
         const celebrationNode = document.getElementById('celebration-parent');
         const journalNode = document.getElementById('journalHolder');
         const scoresNode = document.getElementById('scoresHolder');
+        const chefSelectionSection = document.getElementById('select-chef-section');
+
         let lastFrame = -1;
 
         let playerId = 0;
@@ -116,29 +123,22 @@
                 setVisibility(nameBuilderElement, false);
             });
         }
-        
+
+        function instruct(message) {
+            instructionHolder.textContent = message;
+        }
+
         window.addEventListener("load", async () => {
             const res = await axiosGame.get();
             console.log(res);
             
             const responses = res.data.responses;
         });
-        
-        const chefSelectionSection = document.createElement('div');
-        {
-            chefSelectionSection.id = "chefSelectionSection";
 
-            chefSelectionSection.appendChild(document.createTextNode('A player must choose to be the next chef'));
-
-            const becomeChefButton = document.createElement('Button');
-            becomeChefButton.id = "chefButton";
-            becomeChefButton.textContent = "I'm making the other guess"; 
-            becomeChefButton.addEventListener('click', (event)=>{
-                axiosGame.put(`/chefId/${playerId}`);
-            });
-
-            chefSelectionSection.appendChild(becomeChefButton);
-        }
+        chefSelectionSection.style.display = 'none';
+        document.getElementById('select-chef-button').addEventListener('click', (event) => {
+            axiosGame.put(`/chefId/${playerId}`);
+        });
 
         questionLabel.replaceChildren(guessingField);
 
@@ -230,11 +230,12 @@
                     {
                         chefId = srvChef;
                         if(chefId) {
-                            chefLabel.replaceChildren();
+                            chefSelectionSection.style.display = 'none';
                         }
                         else {
                             hideEveryGameThings();
-                            chefLabel.replaceChildren(chefSelectionSection);
+                            instruct('One player will make others guess');
+                            chefSelectionSection.style.display = '';
                         }
                     }
                     

@@ -25,6 +25,7 @@ function create_pseudonyme_picker() {
         namePart.className = 'pseudo-picker-name-part';
         namePresentationName.appendChild(namePart);
         const namePartInner = document.createElement('div');
+        namePartInner.textContent = '---------';
         namePart.appendChild(namePartInner);
         finalNameParts[index] = namePartInner;
         namePartInner.addEventListener('animationend', () => {
@@ -52,7 +53,7 @@ function create_pseudonyme_picker() {
                 return;
             }
         }
-        pseudoPicker.confirmationButton.style.display = '';
+        pseudoPicker.confirmationButton.style.visibility = 'visible';
     };
     const nameOptionsNode = document.createElement('div');
     nameOptionsNode.className = 'pseudo-picker-content';
@@ -88,7 +89,7 @@ function create_pseudonyme_picker() {
                 id
             } }));
     });
-    confirmationButton.style.display = 'none';
+    confirmationButton.style.visibility = 'hidden';
     namePresentation.appendChild(confirmationButton);
     pseudoPicker.appendChild(namePresentation);
     pseudoPicker.confirmationButton = confirmationButton;

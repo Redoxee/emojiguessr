@@ -12,7 +12,7 @@
 
 body {
     background: var(--main-background);
-    font-size: 20px;
+    font-size: 40px;
     font-family: sans-serif, "Twemoji Mozilla", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", "EmojiOne Color", "Android Emoji", sans-serif;
     color: var(--plain-text);
     height: 100%;
@@ -21,29 +21,22 @@ body {
 #game {
     display: felx;
     flex-direction: column;
-    padding-left: 3em;
-    padding-right: 3em;
+    padding: 0 1em 0 1em;
 }
 
+
+#title {
+    font-size: 100px;
+    font-weight: bold;
+    grid-area: title;
+    text-align: left;
+}
 #upperRow {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
     word-wrap: break-word;
     width: 100%;
-}
-
-#title {
-    font-size: 3em;
-    font-weight: bold;
-    grid-area: title;
-    text-align: center;
-}
-
-@media screen and (max-aspect-ratio: 1/1) {
-    body {
-        font-size: 30px;
-    }
 }
 
 #playerLabel {
@@ -85,12 +78,6 @@ body {
     grid-template-columns: 1fr 2fr 1fr;
     justify-items: stretch;
     width: 100%;
-}
-
-button {
-    background-color: var(--input-background);
-    color: var(--input-text);
-    height: fit-content;
 }
 
 #journalHolder {
@@ -274,5 +261,15 @@ emoji-picker {
     to {
         opacity: 100%;
         top: 0em;
+    }
+}
+
+@media (min-width: 1281px) {
+    body {
+        font-size: 20px;
+    }
+
+    .pseudo-picker-group {
+        gap: .5em;
     }
 }

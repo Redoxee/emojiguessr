@@ -9,8 +9,9 @@
 .pseudo-picker-content {
 	display: flex;
 	flex-direction: row;
-	gap: 3em;
-	
+	gap: 1em;
+	width: 100%;
+	max-width: 30em;
 }
 
 .pseudo-picker-group {
@@ -19,7 +20,7 @@
     place-content: center;
     place-items: center;
 	width: 100%;
-	gap: .15em;
+	gap: 1em;
 }
 
 .pseudo-picker-button.selected {
@@ -30,10 +31,10 @@
 .pseudo-picker-name-presentation {
 	display: flex;
 	flex-direction: row;
-	gap: 1em;
 	height: auto;
 	align-items: center;
 	margin-top: 1em;
+	flex-wrap: wrap;
 }
 
 .pseudo-picker-name-presentation-name {
@@ -41,7 +42,7 @@
 	flex-direction: row;
 	align-items: center;
 	height: auto;
-	gap: .4em;
+	margin: 0 .25em 0 .25em;
 }
 
 .pseudo-picker-name-part {
@@ -49,7 +50,7 @@
 	color: --input-text;
 	border-radius: .3em;
 	text-align: center;
-	min-width: 5em;
+	min-width: 4em;
 	padding: .2em;
 	min-height: 1.2em;
 	position: relative;
@@ -59,12 +60,17 @@
 	position: relative;
 }
 
-
 .pseudo-picker-button {
-	width: 16em;
-	height: auto;
+	width: 9em;
+	height: 2em;
+	font-size: .7em;
 	padding: 0em;
 	border-radius: .5em;
+}
+
+.pseudo-picker-confirmation {
+	width: auto;
+	font-size: 1em;
 }
 
 .pseudo-picker-part-selected {

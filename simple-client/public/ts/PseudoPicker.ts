@@ -40,6 +40,7 @@ function create_pseudonyme_picker() : PseudoPicker {
 		namePart.className = 'pseudo-picker-name-part';
 		namePresentationName.appendChild(namePart);
 		const namePartInner = document.createElement('div');
+		namePartInner.textContent = '---------';
 		namePart.appendChild(namePartInner);
 		finalNameParts[index] = namePartInner;
 
@@ -73,7 +74,7 @@ function create_pseudonyme_picker() : PseudoPicker {
 			}
 		}
 
-		pseudoPicker.confirmationButton.style.display = '';
+		pseudoPicker.confirmationButton.style.visibility = 'visible';
 	}
 
 	const nameOptionsNode = document.createElement('div');
@@ -117,7 +118,7 @@ function create_pseudonyme_picker() : PseudoPicker {
 		}}));
 	});
 	
-	confirmationButton.style.display = 'none';
+	confirmationButton.style.visibility = 'hidden';
 	namePresentation.appendChild(confirmationButton);
 	
 	pseudoPicker.appendChild(namePresentation);
