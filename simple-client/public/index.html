@@ -39,6 +39,7 @@
                 <div id="inputContainer">
                     <emoji-picker></emoji-picker>
                     <div id="keyboard-holder"></div>
+                    <keyboard-element id="keyboard-element" layoutName="azerty"></keyboard-element>
                     <div id="select-chef-section">
                         <button id="select-chef-button">I'm making the other guess</button>
                     </div>
@@ -77,13 +78,16 @@
         const questionLabel = document.getElementById('questionLabel');
         const emojiPicker = document.querySelector('emoji-picker'); 
         const hintHolder = document.getElementById('hintHolder');
-        const inputHolder = document.getElementById('keyboard-holder');
         const nextRoundButton = document.getElementById('nextRoundButton');
         const resetButton = document.getElementById("reset");
         const celebrationNode = document.getElementById('celebration-parent');
         const journalNode = document.getElementById('journalHolder');
         const scoresNode = document.getElementById('scoresHolder');
         const chefSelectionSection = document.getElementById('select-chef-section');
+        const keyboardHolder = document.getElementById('keyboard-holder');
+
+        const keyboardElement = (new KeyboardElement()).root;
+        keyboardHolder.appendChild(keyboardElement);
 
         let lastFrame = -1;
 
@@ -95,7 +99,6 @@
         let pauseRefresh = false;
         let hintBtns = [];
         let guessingField = create_guessing_field_element();
-        let keyboardModule = create_keyboard_element("azerty");
 
         function createElementWithId(elementType, id) {
             const element = document.createElement(elementType);
@@ -106,7 +109,7 @@
         function hideEveryGameThings() {
             setVisibility(emojiPicker, false);
             setVisibility(nextRoundButton, false);
-            setVisibility(inputHolder, false);
+            setVisibility(keyboardElement, false);
             setVisibility(questionLabel, false);
             setVisibility(hintHolder, false);
             setVisibility(journalNode, false);
@@ -144,8 +147,7 @@
 
         questionLabel.replaceChildren(guessingField);
 
-        inputHolder.replaceChildren(keyboardModule);
-		keyboardModule.addEventListener("OnCustomKeyBoardInput", e => {
+		keyboardElement.addEventListener("OnCustomKeyBoardInput", e => {
             if (playerId !== chefId) {
                 guessingField.Input(e.detail);
             }
@@ -249,7 +251,7 @@
                             instruct('Use emoji to communicate the answer to the other players (less emoji -> more points)');
                             setVisibility(emojiPicker, true)
                             setVisibility(nextRoundButton, true);
-                            setVisibility(inputHolder, false);
+                            setVisibility(keyboardElement, false);
                         }
                         else {
                             if(hints.length < 1) {
@@ -259,7 +261,7 @@
                             }
 
                             setVisibility(nextRoundButton, false);
-                            setVisibility(inputHolder, true);
+                            setVisibility(keyboardElement, true);
                         }
                         
                         {
@@ -272,7 +274,6 @@
                                     hintHolder.removeChild(hintHolder.childNodes[hintHolder.childNodes.length - 1]);
                                 }
                             }
-
                             else if(hintHolder.childNodes.length < numberOfHintItem) {
                                 const numberToAdd = numberOfHintItem - hintHolder.childNodes.length;
                                 for (let index = 0; index < numberToAdd; ++index) {
