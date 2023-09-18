@@ -12,7 +12,7 @@
 
 body {
     background: var(--main-background);
-    font-size: 40px;
+    font-size: 30px;
     font-family: sans-serif, "Twemoji Mozilla", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji", "EmojiOne Color", "Android Emoji", sans-serif;
     color: var(--plain-text);
     height: 100%;
@@ -23,6 +23,7 @@ body {
     flex-direction: column;
     text-align: center;
     padding: 0 1em 0 1em;  
+    height: 100vh;
 }
 
 
@@ -54,7 +55,7 @@ body {
 }
 
 #hintHolder {
-    margin-top: 2em;
+    margin: 2em 0 .5em .5em;
     display: flex;
     justify-content: left;
     gap: 1em;
@@ -63,8 +64,8 @@ body {
     max-width: 100%;
     background-color: var(--prompt-background);
     border-radius: .5em;
-    min-height: 3.4em;
-    padding: .2em 5em .2em .4em;
+    min-height: 3 em;
+    padding: .2em;
 }
 
 #questionLabel {
@@ -75,20 +76,32 @@ body {
 }
 
 #information-row {
-    background-color: bisque;
     width: 100%;
     flex-grow: 1;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    margin-top: 1em;
+}
+
+#next-round-button {
+    font-size: 1em;
+}
+
+#journalHolder {
+    justify-content: left;
+    font-size: 1em;
+}
+
+#scoresHolder {
+    text-align: right;
+    font-size: .8em;
 }
 
 #lowerRow {
     justify-items: stretch;
     width: 100%;
     margin-top: 1em;
-}
-
-#journalHolder {
-    justify-content: left;
-    font-size: 1em;
 }
 
 #inputContainer {
@@ -100,27 +113,31 @@ body {
     font-size: 2em;
 }
 
-#scoresHolder {
-    text-align: right;
-}
-
-#hint{
+#hint {
     display: inline-block;
     position: relative;
-    width: 3em;
+    width: 2.5em;
     cursor: pointer;
+}
+
+.new-hint {
     animation: new-hint 0.5s ease-out 0s 1 normal forwards;
+}
+
+#hint-placeholder {
+    width: 2em;
+    height: 2em;
 }
 
 #hint > p {
     margin: 0%;
-    font-size: 3em;
+    font-size: 2em;
     text-align: center;
 }
 
 #hint > #popover {
     position: absolute;
-    width: 2em;
+    width: 3rem;
     cursor: pointer;
     top: 10px;
     left: 50%;
@@ -146,7 +163,7 @@ body {
 #popover-body {
     background-color: var(--input-inverted);
     border-color: var(--input-inverted);
-    height: 1.5em;
+    height: 2.5rem;
     border-radius: .3em;
     display: flex;
     justify-content: center;
@@ -155,8 +172,8 @@ body {
 
 #popover-content {
   background-color: black;
-  width: 1.2em;
-  height: 1.2em;
+  width: 90%;
+  height: 90%;
   clip-path: polygon(10% 0, 50% 40%, 90% 0, 100% 10%, 60% 50%, 100% 90%, 90% 100%, 50% 60%, 10% 100%, 0 90%, 40% 50%, 0 10%);
 }
 
@@ -174,14 +191,8 @@ body {
     gap: .2em;
 }
 
-#chefSelectionSection {
-    width: 100%;
-
-    display: flex;
-    flex-direction: row;
-    gap: 1em;
-    align-content: center;
-    align-items: center;
+#select-chef-section {
+    margin-top: 1em;
 }
 
 button {
@@ -201,10 +212,9 @@ button {
 
 emoji-picker {
     --background : var(--prompt-background);
-    --emoji-size: 1.5em;
-    --category-emoji-size: 1.5em;
+    --emoji-size: 3.5rem;
     --num-columns: 6;  
-    --input-font-size: 1.5em;
+    --input-font-size: 3.5rem;
     --input-placeholder-color: var(--input-inverted);
     height: 20em;
     width: 85%;
@@ -215,13 +225,13 @@ emoji-picker {
 }
 
 #footer {
-    position: absolute;
-    bottom: .5em;
-    width: 90%;
-    margin: 0 1em .5em 1em;
+    width: 100%;
+    margin-top: 1em;
+    margin-bottom: 1em;
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+    align-items: center;
 }
 
 #credits {
@@ -232,16 +242,17 @@ emoji-picker {
 }
 
 #debug {
+    font-size: 0.5em;
     display: flex;
     flex-flow: row;
     justify-content: flex-end;
     gap: 1em;
+    margin-right: 2em;
 }
 
-#debug > * {
-    font-size: 0.5em;
-    padding: 0em;
-    border-radius: 0em;
+#debug button {
+    font-size: 0.8em;
+    padding: 2px;
 }
 
 #celebration-parent {
@@ -275,12 +286,18 @@ emoji-picker {
 @keyframes new-hint {
     from {
         opacity: 0%;
-        top: -.4em;
+        right: -.4em;
     }
 
     to {
         opacity: 100%;
-        top: 0em;
+        right: 0em;
+    }
+}
+
+@media (min-width: 1024px) {
+    body {
+        font-size: 40px;
     }
 }
 

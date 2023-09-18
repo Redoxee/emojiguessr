@@ -27,32 +27,35 @@
             </div>
             <div id="instruction"></div>
             <div id = "NameBuilder"></div>
+            <div id="select-chef-section">
+                <button id="select-chef-button">I'm making the other guess</button>
+            </div>
             <div id="hintContainer">
                 <div id="hintHolder"></div>
             </div>
             <div id="questionLabel"></div>
             <div id="information-row">
+                <div id="controls-holder">
+                    <button id="next-round-button">Next Round</button>
+                </div>
                 <div id="scoresHolder"></div>
-                <div id="journalHolder"></div>
             </div>
             <div id="lowerRow">
                 <div id="inputContainer">
                     <emoji-picker></emoji-picker>
                     <div id="keyboard-holder"></div>
                     <keyboard-element id="keyboard-element" layoutName="azerty"></keyboard-element>
-                    <div id="select-chef-section">
-                        <button id="select-chef-button">I'm making the other guess</button>
-                    </div>
                 </div>
             </div>
-        </div>
-        <button id="nextRoundButton">Next Round</button>
-        <div id="footer">
-            <div id="credits">Made by AntonMakesGames with help from François Eoche</div>
-            <div id='debug'>
-                <button id="debug-button">Debug</button>
-                <button id="reset">Reset Game</button>
-                <button id='pause'>Pause</button>
+            <div id="footer">
+                <div id="credits">Made by AntonMakesGames with help from François Eoche</div>
+                <div id="debug">
+                    <button id="debug-button">Debug</button>
+                    <div id="debug-section" style="display:none;">
+                        <button id="reset">Reset Game</button>
+                        <button id='pause'>Pause</button>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -78,16 +81,16 @@
         const questionLabel = document.getElementById('questionLabel');
         const emojiPicker = document.querySelector('emoji-picker'); 
         const hintHolder = document.getElementById('hintHolder');
-        const nextRoundButton = document.getElementById('nextRoundButton');
-        const resetButton = document.getElementById("reset");
+        const nextRoundButton = document.getElementById('next-round-button');
         const celebrationNode = document.getElementById('celebration-parent');
-        const journalNode = document.getElementById('journalHolder');
         const scoresNode = document.getElementById('scoresHolder');
         const chefSelectionSection = document.getElementById('select-chef-section');
         const keyboardHolder = document.getElementById('keyboard-holder');
-
+        
         const keyboardElement = (new KeyboardElement()).root;
         keyboardHolder.appendChild(keyboardElement);
+        
+        const newHintClassName = "new-hint";
 
         let lastFrame = -1;
 
@@ -112,11 +115,12 @@
             setVisibility(keyboardElement, false);
             setVisibility(questionLabel, false);
             setVisibility(hintHolder, false);
-            setVisibility(journalNode, false);
             setVisibility(scoresNode, false);
         }
 
         hideEveryGameThings();
+
+        const hintPlaceholder = createElementWithId('div', 'hint-placeholder');
         
         {
             const pseudonymPicker = create_pseudonyme_picker();
@@ -131,6 +135,60 @@
 
         function instruct(message) {
             instructionHolder.textContent = message;
+        }
+
+        function createHintPopOver() {
+            const popover = createElementWithId('div', 'popover');
+            const popoverBody = createElementWithId('button', 'popover-body');
+            const pointer = createElementWithId('div', 'popover-pointer');
+            const popoverContent = createElementWithId('div', 'popover-content');
+            popover.appendChild(popoverBody);
+            popover.appendChild(pointer);
+            popoverBody.appendChild(popoverContent);
+            popover.body = popoverBody;
+            
+            popover.className = "popover-hidden";
+            popover.OpenCloseInteraction = ()=>{
+                if(popover.classList.contains("popover-hidden") && playerId === chefId) {
+                    popover.classList.remove('popover-hidden');
+                    popover.classList.add('popover-show')
+                } else {
+                    popover.classList.remove('popover-show');
+                    popover.classList.add('popover-hidden');
+                }
+            }
+
+            return popover;
+        }
+
+        function hidePopover(popover) {
+            if (popover.classList.contains('popover-show')) {
+                    popover.classList.remove('popover-show');
+                    popover.classList.add('popover-hidden');
+            }
+        }
+
+        function createHintNode(index) {
+            const hint = createElementWithId('div', 'hint');
+            hint.content = createElementWithId('p', 'hint-content');
+            hint.appendChild(hint.content);
+            hint.popover = createHintPopOver();
+            hint.appendChild(hint.popover);
+            
+            hint.addEventListener('click', hint.popover.OpenCloseInteraction);
+
+            hint.popover.body.addEventListener('click',()=>{
+                if (playerId === chefId) {
+                    axiosGame.put(`/delete/${playerId}/${index}`);
+                }
+            });
+
+            return hint;
+        }
+
+        const maximumNumberOfHints = 34;
+        for (let index = 0; index < maximumNumberOfHints; ++index) {
+            hintBtns.push(createHintNode(index));
         }
 
         window.addEventListener("load", async () => {
@@ -184,30 +242,6 @@
             }
 		});
 
-        const createHintPopOver = function() {
-            const popover = createElementWithId('div', 'popover');
-            const popoverBody = createElementWithId('button', 'popover-body');
-            const pointer = createElementWithId('div', 'popover-pointer');
-            const popoverContent = createElementWithId('div', 'popover-content');
-            popover.appendChild(popoverBody);
-            popover.appendChild(pointer);
-            popoverBody.appendChild(popoverContent);
-            popover.body = popoverBody;
-            
-            popover.className = "popover-hidden";
-            popover.OpenCloseInteraction = ()=>{
-                if(popover.classList.contains("popover-hidden") && playerId === chefId) {
-                    popover.classList.remove('popover-hidden');
-                    popover.classList.add('popover-show')
-                } else {
-                    popover.classList.remove('popover-show');
-                    popover.classList.add('popover-hidden');
-                }
-            }
-
-            return popover;
-        }
-
         async function refresh() {
             if(playerId && !pauseRefresh)
             {
@@ -244,7 +278,7 @@
                     }
                     
                     if (chefId) {
-
+                        const previousHintCount = hints.length;
                         hints = res.data.hints;
                         
                         if(chefId === playerId) {
@@ -267,34 +301,26 @@
                         {
                             setVisibility(hintHolder, true);
                             setVisibility(questionLabel, true);
-                            
-                            const numberOfHintItem = hints.length;
-                            if (hintHolder.childNodes.length > numberOfHintItem) {
-                                while(hintHolder.childNodes.length > numberOfHintItem) {
-                                    hintHolder.removeChild(hintHolder.childNodes[hintHolder.childNodes.length - 1]);
+                            setVisibility(scoresNode, true);
+                            const numberOfHintItem = Math.min(hints.length, maximumNumberOfHints);
+                            hintHolder.replaceChildren();
+                            console.log(`previous ${previousHintCount} present ${numberOfHintItem}`);
+                            for (let index = 0; index < numberOfHintItem; ++index) {
+                                hintHolder.appendChild(hintBtns[index]);
+                                if (index < previousHintCount) {
+                                    if(hintBtns[index].classList.contains(newHintClassName)) {
+                                        hintBtns[index].classList.remove(newHintClassName);
+                                    }
+                                }
+                                else {
+                                    if(!hintBtns[index].classList.contains(newHintClassName)) {
+                                        console.log(`added ${index}`)
+                                        hintBtns[index].classList.add(newHintClassName);
+                                    }
                                 }
                             }
-                            else if(hintHolder.childNodes.length < numberOfHintItem) {
-                                const numberToAdd = numberOfHintItem - hintHolder.childNodes.length;
-                                for (let index = 0; index < numberToAdd; ++index) {
-                                    const hint = createElementWithId('div', 'hint');
-                                    hint.content = createElementWithId('p', 'hint-content');
-                                    hint.appendChild(hint.content);
-                                    hint.popover = createHintPopOver();
-                                    hint.appendChild(hint.popover);
-                                    
-                                    hint.addEventListener('click', hint.popover.OpenCloseInteraction);
 
-                                    const hintIndex = hintHolder.childElementCount;
-                                    hint.popover.body.addEventListener('click',()=>{
-                                        if (playerId === chefId) {
-                                            axiosGame.put(`/delete/${playerId}/${hintIndex}`);
-                                        }
-                                    });
-
-                                    hintHolder.appendChild(hint);
-                                }
-                            }
+                            hintHolder.appendChild(hintPlaceholder);
                             
                             for (let i = 0; i < numberOfHintItem; ++i) {
                                 const hintItem = hintHolder.childNodes[i];
@@ -304,16 +330,6 @@
                                 else {
                                     hintItem.content.replaceChildren();
                                 }
-                            }
-                        }
-                        
-                        {
-                            journalNode.replaceChildren();
-                            const serverJournal = res.data.journal;
-                            for(let entryIndex = 0; entryIndex < serverJournal.length; ++entryIndex)
-                            {
-                                const entry = serverJournal[entryIndex];
-                                journalNode.appendChild(TranslateJournalEntry(entry));
                             }
                         }
                         
@@ -330,11 +346,23 @@
         }
 
         setInterval(refresh, refreshRate)
-        resetButton.addEventListener('click',(event)=> {
+
+        const debugSection = document.getElementById("debug-section");
+        const debugButton = document.getElementById("debug")
+        debugButton.addEventListener("click", (event) => {
+            if(debugSection.style.display !== "none") {
+                debugSection.style.display = "none";
+            } else {
+                debugSection.style.display = "";
+            }
+        });
+
+        const resetButton = document.getElementById("reset");
+        document.getElementById("reset").addEventListener('click',(event) => {
             axiosGame.put(`/reset/${playerId}`);
         });
         
-        let pauseButton = document.getElementById('pause');
+        const pauseButton = document.getElementById('pause');
         pauseButton.addEventListener('click', ()=> {
             pauseRefresh = !pauseRefresh;
         });
@@ -358,7 +386,7 @@
         function TranslateScores(scoreEntry) {
             const entryNode = document.createElement('div');
             entryNode.className = 'scoreEntry';
-            let playerName = scoreEntry.playerId === playerId.toString() ? `${String.fromCodePoint(0x1FAF5)} ${GetNameFromId(scoreEntry.playerId)}` : GetNameFromId(scoreEntry.playerId);
+            let playerName = scoreEntry.playerId === playerId.toString() ? `😃 ${GetNameFromId(scoreEntry.playerId)}` : GetNameFromId(scoreEntry.playerId);
             if (scoreEntry.playerId === chefId.toString()) {
                 playerName = `${playerName} 🤠`;
             }
