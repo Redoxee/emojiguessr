@@ -28,7 +28,6 @@ function create_guessing_field_element() {
     guessingField.addEventListener("animationend", () => {
         guessingField.classList.remove(fieldHorizontalShakeClassName);
     });
-    guessingField.style.animationDuration = `${shakeDuration}s`;
     for (let index = 0; index < 200; ++index) {
         const letter = document.createElement("div");
         const letterContent = document.createElement("div");

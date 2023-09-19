@@ -21,7 +21,7 @@
 
     <body>
         <div id="game">
-            <div id="title">🌶 EmojiGuessr 🔥</div>
+            <div id="title" class="win-animation">🌶 EmojiGuessr 🔥</div>
             <div id="upperRow">
                 <div id='chefLabel'></div>
             </div>
@@ -91,6 +91,8 @@
         keyboardHolder.appendChild(keyboardElement);
         
         const newHintClassName = "new-hint";
+        const correctAnswerClassName = "correct-answer";
+        const correctAnswerTextClassName = "correct-answer-text";
 
         let lastFrame = -1;
 
@@ -102,6 +104,7 @@
         let pauseRefresh = false;
         let hintBtns = [];
         let guessingField = create_guessing_field_element();
+        let roundResults = [];
 
         function createElementWithId(elementType, id) {
             const element = document.createElement(elementType);
@@ -277,6 +280,8 @@
                         }
                     }
                     
+                    roundResults = res.data.roundResults;
+
                     if (chefId) {
                         const previousHintCount = hints.length;
                         hints = res.data.hints;
@@ -302,6 +307,15 @@
                             setVisibility(hintHolder, true);
                             setVisibility(questionLabel, true);
                             setVisibility(scoresNode, true);
+
+                            if(roundResults[playerId]) {
+                                guessingField.classList.add(correctAnswerClassName);
+                                instruct('🎉 🥳 CORRECT 👏 🎊');
+                            }
+                            else if (guessingField.classList.contains(correctAnswerClassName)) {
+                                guessingField.classList.remove(correctAnswerClassName);
+                            }
+
                             const numberOfHintItem = Math.min(hints.length, maximumNumberOfHints);
                             hintHolder.replaceChildren();
                             console.log(`previous ${previousHintCount} present ${numberOfHintItem}`);
@@ -337,7 +351,10 @@
                             scoresNode.replaceChildren();
                             const scores = res.data.scores;
                             for (let index = 0; index < scores.length; ++index) {
-                                scoresNode.appendChild(TranslateScores(scores[index]));
+                                const scoreEntry = scores[index];
+                                const scoreLabel = TranslateScores(scoreEntry, roundResults[scoreEntry.playerId]);
+                                scoresNode.appendChild(scoreLabel);
+                                scoreLabel.style.animationDelay = `${0.25 * index}s`;
                             }
                         }
                     }
@@ -383,7 +400,7 @@
             return entryNode;
         }
 
-        function TranslateScores(scoreEntry) {
+        function TranslateScores(scoreEntry, hasTheAnswer) {
             const entryNode = document.createElement('div');
             entryNode.className = 'scoreEntry';
             let playerName = scoreEntry.playerId === playerId.toString() ? `😃 ${GetNameFromId(scoreEntry.playerId)}` : GetNameFromId(scoreEntry.playerId);
@@ -395,6 +412,9 @@
             }
 
             entryNode.textContent = `${playerName} : ${scoreEntry.score}🏅`;
+            if(hasTheAnswer) {
+                entryNode.classList.add(correctAnswerTextClassName);
+            }
             return entryNode;
         }
     </script>

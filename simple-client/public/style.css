@@ -32,6 +32,7 @@ body {
     font-weight: bold;
     text-align: center;
 }
+
 #upperRow {
     display: flex;
     flex-direction: row;
@@ -292,6 +293,51 @@ emoji-picker {
     to {
         opacity: 100%;
         right: 0em;
+    }
+}
+
+.correct-answer {
+    animation: correct-answer-animation 3s linear 0s infinite normal none;
+}
+
+@keyframes correct-answer-animation {
+    0%, 100%{
+        background-color: #ff0000;
+    }
+    10%, 60% {
+        background-color: #eeff2f;
+    }
+    20%, 50%, 90% {
+        background-color: #34d60f;
+    }
+    30%, 80% {
+        background-color: #0013e6;
+    }
+
+    40%, 70% {
+        background-color: #e02bcb;
+    }
+}
+
+.correct-answer-text {
+    animation: correct-answer-text-animation 3s linear 0s infinite normal none;
+}
+
+@keyframes correct-answer-text-animation {
+    0%, 100%{
+        color: #ff0000;
+    }
+    10%, 60% {
+        color: #eeff2f;
+    }
+    20%, 50%, 90% {
+        color: #34d60f;
+    }
+    30%, 80% {
+        color: #0013e6;
+    }
+    40%, 70% {
+        color: #e02bcb;
     }
 }
 

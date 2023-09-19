@@ -132,9 +132,7 @@
 }
 
 .horizontal-shake {
-	animation-name: wrong-horizontal-shake;
-	animation-timing-function: cubic-bezier(0.075, 0.82, 0.165, 1);
-	animation-fill-mode: forwards;
+	animation: wrong-horizontal-shake .5s cubic-bezier(0.075, 0.82, 0.165, 1) 0s 1 normal forwards;;
 }
 
 @keyframes wrong-horizontal-shake {
