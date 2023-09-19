@@ -215,7 +215,7 @@
 		});
 
 		guessingField.addEventListener("submit", async (event)=>{
-            const guess = event.detail.value;
+            const guess = event.detail.value.trim();
             console.log(`sending ${guess} ${guess.length}, ${guessingField.pattern.length}`);
             console.log(`"${guess}"`);
             console.log(`"${guessingField.pattern}"`);
@@ -331,6 +331,8 @@
                                         console.log(`added ${index}`)
                                         hintBtns[index].classList.add(newHintClassName);
                                     }
+                                    
+                                    hidePopover(hintBtns[index].popover);
                                 }
                             }
 

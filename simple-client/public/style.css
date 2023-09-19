@@ -355,4 +355,12 @@ emoji-picker {
     .pseudo-picker-group {
         gap: .5em;
     }
+    
+    emoji-picker {
+        --emoji-size: 2rem;
+        --num-columns: 10;  
+        --input-font-size: 2rem;
+        height: auto;
+        width: auto;
+    }
 }
